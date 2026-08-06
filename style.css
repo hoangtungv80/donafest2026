@@ -1,10 +1,27 @@
-/* =============================================
-   DONATEAM 2026 — GTA VI Theme
-   Fonts: UTM Talling / UTM Mobifone / UTM Avo
-   Colors: Hot pink, sunset orange, teal, neon
-   ============================================= */
+/* ====== FONT DECLARATIONS ====== */
+@font-face {
+    font-family: 'UTM Avo';
+    src: url('fonts/UTM Avo.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
 
+@font-face {
+    font-family: 'UTM Avo Bold';
+    src: url('fonts/UTM AvoBold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
 
+@font-face {
+    font-family: 'UTM Talling';
+    src: url('fonts/UTM TallingBold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
 
 /* ====== GTA VI DESIGN TOKENS ====== */
 :root {
@@ -43,10 +60,11 @@
     --text-secondary: #b8b5d0;
     --text-muted: #6b6893;
 
-    /* Fonts — Outfit (Google Fonts) */
-    --font-title: 'Outfit', sans-serif;
-    --font-title2: 'Outfit', sans-serif;
-    --font-body: 'Outfit', sans-serif;
+    /* Fonts — UTM Avo Bold for headings/elements, UTM Avo for body text */
+    --font-hero: 'UTM Talling', 'UTM Avo Bold', 'Outfit', sans-serif;
+    --font-title: 'UTM Avo Bold', 'Outfit', sans-serif;
+    --font-title2: 'UTM Avo Bold', 'Outfit', sans-serif;
+    --font-body: 'UTM Avo', 'Outfit', sans-serif;
 
     /* Radius */
     --radius-sm: 8px;
