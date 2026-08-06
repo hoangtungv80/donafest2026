@@ -1272,6 +1272,14 @@ img { max-width: 100%; height: auto; display: block; }
     background-clip: text;
 }
 
+.rate-number.sub2 {
+    font-size: 1.8rem;
+    background: linear-gradient(135deg, #ff6b2c, #ffd166);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
 .rate-label {
     font-family: var(--font-body);
     font-size: 0.95rem;
