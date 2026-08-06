@@ -1563,6 +1563,13 @@ img { max-width: 100%; height: auto; display: block; }
     color: var(--text-muted);
 }
 
+.venue-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+}
+
 /* ====== REGISTER ====== */
 .register-section {
     position: relative;
