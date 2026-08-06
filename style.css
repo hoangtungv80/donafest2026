@@ -1179,12 +1179,9 @@ img { max-width: 100%; height: auto; display: block; }
     background: var(--bg-primary);
 }
 
-/* Pricing Section - 2 Columns */
-.pricing-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 32px;
-    max-width: 1080px;
+/* Pricing Section - Single Main Card */
+.pricing-card-wrapper {
+    max-width: 680px;
     margin: 0 auto;
 }
 
