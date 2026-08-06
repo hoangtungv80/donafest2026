@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DONATEAM 5 NĂM 1 HÀNH TRÌNH | Cung Đường Di Sản 2026</title>
+    <meta name="description" content="CUNG ĐƯỜNG DI SẢN - DONATEAM 5 Năm 1 Hành Trình. 15-16/08/2026 tại Grand View Palace Hạ Long Hotel. Đoàn Kết - Đam Mê - Chia Sẻ - Phát Triển.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="loader-content">
+            <div class="loader-logo">DONATEAM</div>
+            <div class="loader-sub">DRIVE TOGETHER — GROW TOGETHER</div>
+            <div class="loader-bar"><div class="loader-progress"></div></div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="#home" class="nav-logo">
+                <span class="logo-dona">DONA</span><span class="logo-team">TEAM</span>
+                <span class="logo-vn">VIETNAM</span>
+            </a>
+            <div class="nav-links" id="navLinks">
+                <a href="#home" class="nav-link active" data-section="home">Trang chủ</a>
+                <a href="#about" class="nav-link" data-section="about">Giới thiệu</a>
+                <a href="#schedule" class="nav-link" data-section="schedule">Lịch trình</a>
+                <a href="#pricing" class="nav-link" data-section="pricing">Chi phí</a>
+                <a href="#admin" class="nav-link" data-section="admin">Ban tổ chức</a>
+                <a href="#venue" class="nav-link" data-section="venue">Địa điểm</a>
+                <a href="https://forms.gle/673nqzmUmNBtWTTA6" target="_blank" rel="noopener noreferrer" class="nav-link nav-cta">Đăng ký ngay</a>
+            </div>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section - Parallax -->
+    <section id="home" class="hero">
+        <div class="hero-particles" id="particles"></div>
+        <div class="hero-content">
+            <div class="hero-badge" data-aos="fade-down">
+                <span class="badge-icon">🏎️</span>
+                <span>DRIVE TOGETHER — GROW TOGETHER</span>
+            </div>
+            <h1 class="hero-title" data-aos="fade-up" data-aos-delay="100">
+                <span class="title-dona">DONA</span><span class="title-fest">FEST</span>
+                <span class="title-year">2026</span>
+            </h1>
+            <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="200">
+                DONATEAM 5 NĂM 1 HÀNH TRÌNH — CUNG ĐƯỜNG DI SẢN
+            </p>
+            <div class="hero-slogan" data-aos="fade-up" data-aos-delay="250">
+                <span>ĐOÀN KẾT</span>
+                <span class="slogan-dot">✦</span>
+                <span>ĐAM MÊ</span>
+                <span class="slogan-dot">✦</span>
+                <span>CHIA SẺ</span>
+                <span class="slogan-dot">✦</span>
+                <span>PHÁT TRIỂN</span>
+            </div>
+            <div class="hero-date" data-aos="fade-up" data-aos-delay="300">
+                <div class="date-line"></div>
+                <span>15 — 16 / 08 / 2026</span>
+                <div class="date-line"></div>
+            </div>
+            <p class="hero-location" data-aos="fade-up" data-aos-delay="350">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Grand View Palace — Hạ Long Hotel
+            </p>
+            <div class="hero-actions" data-aos="fade-up" data-aos-delay="400">
+                <a href="https://forms.gle/673nqzmUmNBtWTTA6" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                    <span>Đăng ký tham gia</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
+                <a href="#schedule" class="btn btn-outline">
+                    <span>Xem lịch trình</span>
+                </a>
+            </div>
+        </div>
+        <div class="hero-scroll">
+            <div class="scroll-indicator">
+                <div class="scroll-dot"></div>
+            </div>
+            <span>Cuộn xuống</span>
+        </div>
+    </section>
+
+    <!-- Countdown -->
+    <section class="countdown-section">
+        <div class="container">
+            <div class="countdown-wrapper">
+                <div class="countdown-label">SỰ KIỆN BẮT ĐẦU TRONG</div>
+                <div class="countdown" id="countdown">
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="days">00</div>
+                        <div class="countdown-unit">Ngày</div>
+                    </div>
+                    <div class="countdown-sep">:</div>
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="hours">00</div>
+                        <div class="countdown-unit">Giờ</div>
+                    </div>
+                    <div class="countdown-sep">:</div>
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="minutes">00</div>
+                        <div class="countdown-unit">Phút</div>
+                    </div>
+                    <div class="countdown-sep">:</div>
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="seconds">00</div>
+                        <div class="countdown-unit">Giây</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Info Bar -->
+    <section class="info-bar">
+        <div class="container">
+            <div class="info-grid">
+                <div class="info-item" data-aos="fade-up">
+                    <div class="info-icon">📍</div>
+                    <div class="info-label">TRIP</div>
+                    <div class="info-value">Hà Nội — Hạ Long</div>
+                </div>
+                <div class="info-divider"></div>
+                <div class="info-item" data-aos="fade-up" data-aos-delay="100">
+                    <div class="info-icon">🏨</div>
+                    <div class="info-label">ĐỊA ĐIỂM</div>
+                    <div class="info-value">Grand View Palace<br>Hạ Long Hotel</div>
+                </div>
+                <div class="info-divider"></div>
+                <div class="info-item" data-aos="fade-up" data-aos-delay="200">
+                    <div class="info-icon">📅</div>
+                    <div class="info-label">THỜI GIAN</div>
+                    <div class="info-value">15 — 16 / 08</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">5 NĂM — 1 HÀNH TRÌNH</span>
+                <h2 class="section-title">CUNG ĐƯỜNG<br><span class="highlight">DI SẢN</span></h2>
+                <p class="section-desc">
+                    Kỷ niệm 5 năm thành lập DONATEAM — cộng đồng car enthusiast Việt Nam. 
+                    Cùng nhau chinh phục cung đường di sản Hà Nội — Hạ Long, 
+                    gắn kết tình anh em và khơi dậy đam mê tốc độ.
+                </p>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card" data-aos="fade-up">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-number" data-count="1600">0</div>
+                    <div class="stat-suffix">+</div>
+                    <div class="stat-label">Thành viên toàn quốc</div>
+                </div>
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="stat-icon">🏎️</div>
+                    <div class="stat-number" data-count="1000">0</div>
+                    <div class="stat-suffix">+</div>
+                    <div class="stat-label">Xe độ đam mê</div>
+                </div>
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="stat-icon">🏆</div>
+                    <div class="stat-number" data-count="5">0</div>
+                    <div class="stat-suffix"></div>
+                    <div class="stat-label">Năm đồng hành</div>
+                </div>
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="stat-icon">📅</div>
+                    <div class="stat-number" data-count="2">0</div>
+                    <div class="stat-suffix"></div>
+                    <div class="stat-label">Ngày sự kiện</div>
+                </div>
+            </div>
+            <!-- Values -->
+            <div class="values-grid">
+                <div class="value-card" data-aos="fade-up">
+                    <div class="value-icon">🤝</div>
+                    <h4>Đoàn Kết</h4>
+                    <p>Là Sức Mạnh</p>
+                </div>
+                <div class="value-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="value-icon">🔥</div>
+                    <h4>Đam Mê</h4>
+                    <p>Là Động Lực</p>
+                </div>
+                <div class="value-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="value-icon">💎</div>
+                    <h4>Chia Sẻ</h4>
+                    <p>Là Giá Trị</p>
+                </div>
+                <div class="value-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="value-icon">🚀</div>
+                    <h4>Phát Triển</h4>
+                    <p>Là Mục Tiêu</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Events Section - 3 Hoạt Động -->
+    <section id="events" class="events-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">CHƯƠNG TRÌNH</span>
+                <h2 class="section-title">3 HOẠT ĐỘNG<br><span class="highlight">KHÔNG THỂ BỎ LỠ</span></h2>
+            </div>
+            <div class="events-grid">
+                <!-- DONATRIP -->
+                <div class="event-card" data-aos="fade-up">
+                    <div class="event-image">
+                        <img src="images/donatrip.png" alt="DONATRIP - Hành trình di chuyển">
+                        <div class="event-number">01</div>
+                    </div>
+                    <div class="event-content">
+                        <div class="event-tag">NGÀY 1 — SÁNG</div>
+                        <h3 class="event-title">DONATRIP</h3>
+                        <p class="event-desc">
+                            Hành trình di chuyển theo đoàn tuyến Hà Nội — Hạ Long. 
+                            Chiêm ngưỡng cảnh đẹp dọc đường và check-in cùng đoàn xe.
+                        </p>
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                                <span>9:00 — 13:00</span>
+                            </div>
+                            <div class="event-detail">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                <span>Hà Nội → Hạ Long</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DONAGALA -->
+                <div class="event-card" data-aos="fade-up" data-aos-delay="150">
+                    <div class="event-image">
+                        <img src="images/donagala.png" alt="DONAGALA - Gala Dinner">
+                        <div class="event-number">02</div>
+                    </div>
+                    <div class="event-content">
+                        <div class="event-tag">NGÀY 1 — TỐI</div>
+                        <h3 class="event-title">DONAGALA</h3>
+                        <p class="event-desc">
+                            Sự kiện dinner & minigame cho các thành viên tham dự tại Hotel. 
+                            Giao lưu, kết nối và tận hưởng bữa tiệc đặc biệt.
+                        </p>
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                                <span>18:30 — 22:00</span>
+                            </div>
+                            <div class="event-detail">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                <span>Grand View Palace Hạ Long Hotel</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DONAFEST -->
+                <div class="event-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="event-image">
+                        <img src="images/donafest.png" alt="DONAFEST - Diễu hành showcase">
+                        <div class="event-number">03</div>
+                    </div>
+                    <div class="event-content">
+                        <div class="event-tag">NGÀY 2 — SÁNG</div>
+                        <h3 class="event-title">DONAFEST</h3>
+                        <p class="event-desc">
+                            Diễu hành showcase xe trên đường phố Hạ Long. 
+                            Trình diễn và khoe xe cùng cộng đồng DONATEAM.
+                        </p>
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                                <span>8:00 — 12:00</span>
+                            </div>
+                            <div class="event-detail">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                <span>Đường phố Hạ Long</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Parallax Divider 1 -->
+    <section class="parallax-divider">
+        <div class="parallax-bg" style="background-image: url('images/donatrip.png');"></div>
+        <div class="parallax-overlay"></div>
+        <div class="parallax-text">
+            <span class="parallax-quote">"DRIVE TOGETHER — GROW TOGETHER"</span>
+        </div>
+    </section>
+
+    <!-- Schedule Section -->
+    <section id="schedule" class="schedule-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">LỊCH TRÌNH</span>
+                <h2 class="section-title">CHI TIẾT<br><span class="highlight">2 NGÀY SỰ KIỆN</span></h2>
+            </div>
+            <div class="schedule-tabs">
+                <button class="schedule-tab active" data-day="1">
+                    <span class="tab-day">Ngày 1</span>
+                    <span class="tab-date">15/08/2026</span>
+                </button>
+                <button class="schedule-tab" data-day="2">
+                    <span class="tab-day">Ngày 2</span>
+                    <span class="tab-date">16/08/2026</span>
+                </button>
+            </div>
+            <div class="schedule-content">
+                <!-- Day 1 -->
+                <div class="schedule-day active" id="day-1">
+                    <div class="timeline">
+                        <div class="timeline-item" data-aos="fade-right">
+                            <div class="timeline-time">09:30</div>
+                            <div class="timeline-card">
+                                <div class="timeline-badge trip">TRIP</div>
+                                <h4>Địa điểm tập trung</h4>
+                                <p>Trạm dừng nghỉ Hưng Yên (CT Hà Nội — Hải Phòng)</p>
+                                <p class="timeline-note">Chia theo các nhóm chạy mỗi nhóm 5 — 10 xe.<br>Ăn trưa 15/8: AE tự túc theo nhóm chạy.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item" data-aos="fade-right" data-aos-delay="100">
+                            <div class="timeline-time">14:00</div>
+                            <div class="timeline-card">
+                                <div class="timeline-badge hotel">HOTEL</div>
+                                <h4>Check in khách sạn</h4>
+                                <p>Nhận phòng tại Grand View Palace Hạ Long Hotel và nghỉ ngơi.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item" data-aos="fade-right" data-aos-delay="200">
+                            <div class="timeline-time">16:00</div>
+                            <div class="timeline-card">
+                                <div class="timeline-badge meet">CAR MEET</div>
+                                <h4>Car Meet — Giao lưu</h4>
+                                <p>Xếp xe chụp hình check in, giao lưu tại sân của khách sạn.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item" data-aos="fade-right" data-aos-delay="300">
+                            <div class="timeline-time">18:30 — 21:00</div>
+                            <div class="timeline-card">
+                                <div class="timeline-badge gala">GALA</div>
+                                <h4>Ăn tối & Gala Dinner</h4>
+                                <p>Tập trung tại venue. Bữa tiệc tối đặc biệt cùng minigame và giao lưu.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item" data-aos="fade-right" data-aos-delay="400">
+                            <div class="timeline-time">22:00</div>
+                            <div class="timeline-card">
+                                <h4>Tự do ăn chơi, giao lưu</h4>
+                                <p>Thời gian tự do — khám phá Hạ Long về đêm cùng anh em.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Day 2 -->
+                <div class="schedule-day" id="day-2">
+                    <div class="timeline">
+                        <div class="timeline-item" data-aos="fade-right">
+                            <div class="timeline-time">06:00 — 08:00</div>
+                            <div class="timeline-card">
+                                <div class="timeline-badge hotel">HOTEL</div>
+                                <h4>Ăn sáng buffet tại khách sạn</h4>
+                                <p>Bắt đầu ngày mới với bữa sáng buffet tại Grand View Palace.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item" data-aos="fade-right" data-aos-delay="100">
+                            <div class="timeline-time">08:00 — 10:00</div>
+                            <div class="timeline-card">
+                                <div class="timeline-badge meet">SHOWCASE</div>
+                                <h4>Diễu hành chụp ảnh & Cafe</h4>
+                                <p>Đi theo đoàn, cafe tự túc. Chụp ảnh và showcase xe trên đường phố Hạ Long.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item" data-aos="fade-right" data-aos-delay="200">
+                            <div class="timeline-time">10:00 — 12:00</div>
+                            <div class="timeline-card">
+                                <div class="timeline-badge hotel">CHECK OUT</div>
+                                <h4>Nghỉ ngơi & Check out khách sạn</h4>
+                                <p>Ăn trưa chủ động và trả phòng.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item" data-aos="fade-right" data-aos-delay="300">
+                            <div class="timeline-time">12:00 — 14:00</div>
+                            <div class="timeline-card">
+                                <h4>Các nhóm chủ động tự ăn uống</h4>
+                                <p>Thời gian tự do trước khi di chuyển về.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item" data-aos="fade-right" data-aos-delay="400">
+                            <div class="timeline-time">14:00</div>
+                            <div class="timeline-card">
+                                <div class="timeline-badge trip">VỀ HÀ NỘI</div>
+                                <h4>Chạy đoàn về Hà Nội</h4>
+                                <p>Chạy theo sự hướng dẫn của trưởng nhóm. Hẹn gặp lại!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Parallax Divider 2 -->
+    <section class="parallax-divider">
+        <div class="parallax-bg" style="background-image: url('images/donagala.png');"></div>
+        <div class="parallax-overlay"></div>
+        <div class="parallax-text">
+            <span class="parallax-quote">"5 NĂM — 1 HÀNH TRÌNH"</span>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">CHI PHÍ</span>
+                <h2 class="section-title">BẢNG GIÁ<br><span class="highlight">THAM GIA</span></h2>
+            </div>
+            <div class="pricing-grid">
+                <!-- Main Price -->
+                <div class="price-card main" data-aos="fade-up">
+                    <div class="price-badge">NGƯỜI LỚN</div>
+                    <div class="price-amount">
+                        <span class="price-currency">₫</span>
+                        <span class="price-number">1.500.000</span>
+                    </div>
+                    <div class="price-per">/ người</div>
+                    <div class="price-divider"></div>
+                    <div class="price-includes-title">BAO GỒM</div>
+                    <ul class="price-includes">
+                        <li>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                            01 đêm nghỉ tại Grand View Palace Ha Long Hotel
+                        </li>
+                        <li>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                            Ăn sáng buffet
+                        </li>
+                        <li>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                            Gala Dinner
+                        </li>
+                        <li>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                            Kỷ niệm chương, quà lưu niệm
+                        </li>
+                        <li>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                            Hỗ trợ truyền thông, hậu cần, tổ chức
+                        </li>
+                    </ul>
+                    <a href="https://forms.gle/673nqzmUmNBtWTTA6" target="_blank" rel="noopener noreferrer" class="btn btn-primary price-btn">Đăng ký ngay</a>
+                </div>
+                <!-- Children Price -->
+                <div class="price-card children" data-aos="fade-up" data-aos-delay="150">
+                    <div class="price-badge children-badge">TRẺ EM</div>
+                    <div class="children-prices">
+                        <div class="child-tier">
+                            <div class="child-age">Dưới 6 tuổi</div>
+                            <div class="child-price free">MIỄN PHÍ</div>
+                        </div>
+                        <div class="child-tier">
+                            <div class="child-age">6 — 10 tuổi</div>
+                            <div class="child-price">250.000₫ <span>/ bé</span></div>
+                        </div>
+                        <div class="child-tier">
+                            <div class="child-age">12 tuổi trở lên</div>
+                            <div class="child-price">600.000₫ <span>/ bé</span></div>
+                        </div>
+                    </div>
+                    <div class="price-divider"></div>
+                    <div class="price-includes-title">LƯU Ý</div>
+                    <ul class="price-notes">
+                        <li>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            Đi theo sự hướng dẫn của trưởng nhóm
+                        </li>
+                        <li>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            Giữ gìn an toàn giao thông
+                        </li>
+                        <li>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            Vui vẻ — Đoàn kết — Tôn trọng
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin / BTC Section -->
+    <section id="admin" class="admin-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">ĐỘI NGŨ</span>
+                <h2 class="section-title">BAN TỔ CHỨC<br><span class="highlight">& ADMIN TEAM</span></h2>
+                <p class="section-desc">
+                    Những gương mặt tâm huyết đứng sau hành trình kỷ niệm 5 năm DONATEAM — sẵn sàng hỗ trợ các thành viên trong suốt sự kiện.
+                </p>
+            </div>
+            <div class="admin-grid">
+                <!-- Hoàng Tùng -->
+                <a href="https://www.facebook.com/diadaudon/" target="_blank" rel="noopener noreferrer" class="admin-card" data-aos="fade-up">
+                    <div class="admin-avatar">
+                        <img src="images/admin/hoang tung.jpg" alt="Hoàng Tùng">
+                        <div class="admin-fb">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        </div>
+                    </div>
+                    <div class="admin-info">
+                        <h3 class="admin-name">Hoàng Tùng</h3>
+                        <p class="admin-role">Quản lý thành viên, hồ sơ tài trợ</p>
+                    </div>
+                </a>
+
+                <!-- Nghĩa Ngô -->
+                <a href="https://www.facebook.com/nghiarua95" target="_blank" rel="noopener noreferrer" class="admin-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="admin-avatar">
+                        <img src="images/admin/nghia ngo.jpg" alt="Nghĩa Ngô">
+                        <div class="admin-fb">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        </div>
+                    </div>
+                    <div class="admin-info">
+                        <h3 class="admin-name">Nghĩa Ngô</h3>
+                        <p class="admin-role">Phát ngôn viên</p>
+                    </div>
+                </a>
+
+                <!-- Tuấn Anh -->
+                <a href="https://www.facebook.com/heoboi1989" target="_blank" rel="noopener noreferrer" class="admin-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="admin-avatar">
+                        <img src="images/admin/tuan anh.jpg" alt="Tuấn Anh">
+                        <div class="admin-fb">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        </div>
+                    </div>
+                    <div class="admin-info">
+                        <h3 class="admin-name">Tuấn Anh</h3>
+                        <p class="admin-role">Kết nối, tài trợ</p>
+                    </div>
+                </a>
+
+                <!-- Quốc Trung -->
+                <a href="https://www.facebook.com/quoctrungsg97" target="_blank" rel="noopener noreferrer" class="admin-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="admin-avatar">
+                        <img src="images/admin/quoc trung.jpg" alt="Quốc Trung">
+                        <div class="admin-fb">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        </div>
+                    </div>
+                    <div class="admin-info">
+                        <h3 class="admin-name">Quốc Trung</h3>
+                        <p class="admin-role">Tổ chức / MC / Ca sĩ</p>
+                    </div>
+                </a>
+
+                <!-- Tùng Dương -->
+                <a href="https://www.facebook.com/TungDuongVux" target="_blank" rel="noopener noreferrer" class="admin-card" data-aos="fade-up">
+                    <div class="admin-avatar">
+                        <img src="images/admin/Tung duong.jpg" alt="Tùng Dương">
+                        <div class="admin-fb">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        </div>
+                    </div>
+                    <div class="admin-info">
+                        <h3 class="admin-name">Tùng Dương</h3>
+                        <p class="admin-role">Merchandise — Admin VF3 OC</p>
+                    </div>
+                </a>
+
+                <!-- Nguyễn Tùng -->
+                <a href="https://www.facebook.com/nguyen.tung.659784" target="_blank" rel="noopener noreferrer" class="admin-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="admin-avatar">
+                        <img src="images/admin/nguyen tung.jpg" alt="Nguyễn Tùng">
+                        <div class="admin-fb">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        </div>
+                    </div>
+                    <div class="admin-info">
+                        <h3 class="admin-name">Nguyễn Tùng</h3>
+                        <p class="admin-role">Trưởng ban tiếp rượu</p>
+                    </div>
+                </a>
+
+                <!-- Khánh Nguyễn -->
+                <a href="https://www.facebook.com/nhukhah#" target="_blank" rel="noopener noreferrer" class="admin-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="admin-avatar">
+                        <img src="images/admin/khanh nguyen.jpg" alt="Khánh Nguyễn">
+                        <div class="admin-fb">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        </div>
+                    </div>
+                    <div class="admin-info">
+                        <h3 class="admin-name">Khánh Nguyễn</h3>
+                        <p class="admin-role">Hỗ trợ thành viên / Linh vật team</p>
+                    </div>
+                </a>
+
+                <!-- Kiệt Đinh -->
+                <a href="https://www.facebook.com/russo.dinh" target="_blank" rel="noopener noreferrer" class="admin-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="admin-avatar">
+                        <img src="images/admin/kiet dinh.jpg" alt="Kiệt Đinh">
+                        <div class="admin-fb">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        </div>
+                    </div>
+                    <div class="admin-info">
+                        <h3 class="admin-name">Kiệt Đinh</h3>
+                        <p class="admin-role">Hỗ trợ thành viên</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Venue Section -->
+    <section id="venue" class="venue-section">
+        <div class="container">
+            <div class="venue-grid">
+                <div class="venue-image" data-aos="fade-right">
+                    <img src="images/venue.png" alt="Grand View Palace Hạ Long Hotel">
+                    <div class="venue-badge-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </div>
+                </div>
+                <div class="venue-info" data-aos="fade-left">
+                    <span class="section-tag">ĐỊA ĐIỂM</span>
+                    <h2 class="venue-title">Grand View Palace<br>Hạ Long Hotel</h2>
+                    <p class="venue-desc">
+                        Tọa lạc tại vị trí đắc địa với tầm nhìn panorama ra Vịnh Hạ Long, 
+                        Grand View Palace mang đến không gian nghỉ dưỡng sang trọng 
+                        và tiện nghi đẳng cấp cho sự kiện kỷ niệm 5 năm DONATEAM.
+                    </p>
+                    <div class="venue-features">
+                        <div class="venue-feature">
+                            <div class="feature-icon">🏨</div>
+                            <div>
+                                <strong>Khách sạn cao cấp</strong>
+                                <span>Tiện nghi đầy đủ</span>
+                            </div>
+                        </div>
+                        <div class="venue-feature">
+                            <div class="feature-icon">🌊</div>
+                            <div>
+                                <strong>View Vịnh Hạ Long</strong>
+                                <span>Tầm nhìn tuyệt đẹp</span>
+                            </div>
+                        </div>
+                        <div class="venue-feature">
+                            <div class="feature-icon">🅿️</div>
+                            <div>
+                                <strong>Bãi đỗ xe rộng</strong>
+                                <span>Đủ chỗ cho đoàn xe</span>
+                            </div>
+                        </div>
+                        <div class="venue-feature">
+                            <div class="feature-icon">🍽️</div>
+                            <div>
+                                <strong>Nhà hàng & Venue</strong>
+                                <span>Phục vụ Gala Dinner</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=Grand+View+Palace+H%E1%BA%A1+Long+Hotel" target="_blank" class="btn btn-primary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <span>Chỉ đường trên Google Maps</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Registration Section -->
+    <section id="register" class="register-section">
+        <div class="register-parallax">
+            <div class="parallax-bg" style="background-image: url('images/donafest.png');"></div>
+            <div class="parallax-overlay register-overlay"></div>
+        </div>
+        <div class="container">
+            <div class="register-content" data-aos="fade-up">
+                <div class="register-5years">
+                    <div class="years-circle">
+                        <span class="years-num">5</span>
+                        <span class="years-text">YEARS</span>
+                    </div>
+                </div>
+                <span class="section-tag light">ĐĂNG KÝ THAM GIA</span>
+                <h2 class="register-title">SẴN SÀNG CHO<br><span class="highlight">CUNG ĐƯỜNG DI SẢN?</span></h2>
+                <p class="register-desc">
+                    Đừng bỏ lỡ cơ hội trở thành một phần của hành trình kỷ niệm 5 năm DONATEAM!
+                    Số lượng có hạn — đăng ký ngay để giữ chỗ.
+                </p>
+                <a href="https://forms.gle/673nqzmUmNBtWTTA6" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   class="btn btn-register" 
+                   id="registerBtn">
+                    <span>ĐĂNG KÝ NGAY</span>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+                <p class="register-note">Form đăng ký sẽ mở trong tab mới trên Google Forms</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <span class="logo-dona">DONA</span><span class="logo-team">TEAM</span>
+                    </div>
+                    <p class="footer-tagline">Drive Together — Grow Together</p>
+                    <p class="footer-sub">Cộng đồng car enthusiast Việt Nam</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Lịch trình</h4>
+                    <a href="#schedule">Ngày 1 — 15/08</a>
+                    <a href="#schedule">Ngày 2 — 16/08</a>
+                    <a href="#pricing">Chi phí</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Liên kết</h4>
+                    <a href="#home">Trang chủ</a>
+                    <a href="#venue">Địa điểm</a>
+                    <a href="#register">Đăng ký</a>
+                </div>
+                <div class="footer-social">
+                    <h4>Kết nối</h4>
+                    <div class="social-links">
+                        <a href="https://www.facebook.com/groups/292304275709326" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Facebook">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        </a>
+                        <a href="https://www.instagram.com/donateam_vietnam/" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C16.67.014 16.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                        </a>
+                        <a href="https://www.tiktok.com/@xe.ngon.donateam" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="TikTok">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 DONATEAM VIETNAM. All rights reserved. | 5 Năm 1 Hành Trình</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
