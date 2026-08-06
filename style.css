@@ -1839,10 +1839,11 @@ img { max-width: 100%; height: auto; display: block; }
     .footer-content { grid-template-columns: 1fr; gap: 32px; }
 
     /* Parallax fallback for mobile */
+    .hero-slide,
     .hero-parallax-img,
     .hero-overlay {
         position: absolute;
-        background-attachment: scroll;
+        background-attachment: scroll !important;
     }
 
     .parallax-bg {
