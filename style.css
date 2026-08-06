@@ -1161,22 +1161,6 @@ img { max-width: 100%; height: auto; display: block; }
     background: var(--bg-primary);
 }
 
-.pricing-grid {
-    display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 32px;
-    max-width: 900px;
-    margin: 0 auto;
-}
-
-.price-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 40px 36px;
-    position: relative;
-    overflow: hidden;
-    transition: all var(--smooth);
 /* Pricing Section - 2 Columns */
 .pricing-grid {
     display: grid;
