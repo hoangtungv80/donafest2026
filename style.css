@@ -1778,7 +1778,7 @@ img { max-width: 100%; height: auto; display: block; }
 
 /* ====== RESPONSIVE ====== */
 @media (max-width: 1024px) {
-    .stats-grid, .values-grid, .admin-grid { grid-template-columns: repeat(2, 1fr); }
+    .events-grid, .stats-grid, .values-grid, .admin-grid { grid-template-columns: repeat(2, 1fr); }
     .venue-grid { grid-template-columns: 1fr; gap: 40px; }
     .pricing-grid { grid-template-columns: 1fr; max-width: 520px; }
     .footer-content { grid-template-columns: 1fr 1fr; }
@@ -1786,6 +1786,7 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 @media (max-width: 768px) {
+    .events-grid { grid-template-columns: 1fr; gap: 24px; }
     .nav-links {
         position: fixed;
         top: 0;
