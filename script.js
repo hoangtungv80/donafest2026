@@ -191,4 +191,15 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => { registerBtn.style.transform = ''; }, 400);
         }, 4000);
     }
+
+    // ====== HERO PARALLAX SLIDER (AUTO SLIDE 2S) ======
+    const heroSlides = document.querySelectorAll('.hero-slide');
+    if (heroSlides.length > 0) {
+        let currentSlideIndex = 0;
+        setInterval(() => {
+            heroSlides[currentSlideIndex].classList.remove('active');
+            currentSlideIndex = (currentSlideIndex + 1) % heroSlides.length;
+            heroSlides[currentSlideIndex].classList.add('active');
+        }, 2000);
+    }
 });
