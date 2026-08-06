@@ -1484,6 +1484,31 @@ img { max-width: 100%; height: auto; display: block; }
     box-shadow: var(--shadow-glow);
 }
 
+.venue-stars-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 209, 102, 0.12);
+    border: 1px solid rgba(255, 209, 102, 0.4);
+    padding: 8px 18px;
+    border-radius: var(--radius-xl);
+    margin-bottom: 18px;
+    box-shadow: 0 4px 16px rgba(255, 209, 102, 0.15);
+}
+
+.star-rating {
+    font-size: 1rem;
+    letter-spacing: 2px;
+}
+
+.star-label {
+    font-family: var(--font-title);
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: var(--gold);
+}
+
 .venue-title {
     font-family: var(--font-title);
     font-size: clamp(2rem, 4vw, 2.8rem);
