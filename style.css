@@ -1279,6 +1279,14 @@ img { max-width: 100%; height: auto; display: block; }
     color: var(--text-muted);
 }
 
+.rate-note {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--teal);
+    font-style: italic;
+    margin-top: 2px;
+}
+
 .price-divider {
     width: 100%;
     height: 1px;
