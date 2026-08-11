@@ -1,6 +1,6 @@
 /* =============================================
    DONAFEST 2026 — Minigame & Arena Engine
-   Realtime Cloud Synchronization Engine (High-Availability & Cache-Busting Sync)
+   Realtime Cloud Synchronization Engine (High-Availability 2s Multi-Device Live Sync)
    ============================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch(e) {}
     }
 
-    let carsData = getStoredData('dnt_cars_official_v3', OFFICIAL_25_CARS);
+    let carsData = OFFICIAL_25_CARS;
     let categoriesList = getStoredData('dnt_categories_order', DEFAULT_CATEGORIES);
 
     let leaderboardToggles = getStoredData('dnt_leaderboard_toggles', {
@@ -189,7 +189,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isCloudSyncing) return;
         isCloudSyncing = true;
         try {
-            // Append timestamp cache buster query + no-cache headers so browsers NEVER return stale cached data
             const cacheBusterUrl = `${CLOUD_DB_URL}?_t=${Date.now()}`;
             const res = await fetch(cacheBusterUrl, {
                 method: 'GET',
@@ -261,24 +260,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Cache-Control': 'no-cache, no-store, must-revalidate'
                 },
                 body: JSON.stringify({
-                    name: 'DONAFEST_2026_VOTES',
-                    data: {
-                        cars: carsData,
-                        leaderboardToggles: leaderboardToggles,
-                        shoutoutData: shoutoutData,
-                        raceWinnersHistory: raceWinnersHistory,
-                        completedPrizes: completedPrizes,
-                        voteResetVersion: voteResetVersion,
-                        lastUpdated: new Date().toISOString()
-                    }
+                    cars: carsData,
+                    leaderboardToggles: leaderboardToggles,
+                    shoutoutData: shoutoutData,
+                    raceWinnersHistory: raceWinnersHistory,
+                    completedPrizes: completedPrizes,
+                    voteResetVersion: voteResetVersion,
+                    lastUpdated: new Date().toISOString()
                 })
             });
         } catch(e) {}
     }
 
-    // Initial sync & start 3.0s auto-polling for instant multi-device synchronization
+    // Initial sync & 2.0s fast polling loop
     syncCloudData();
-    setInterval(syncCloudData, 3000);
+    setInterval(syncCloudData, 2000);
 
 
     // Web Audio Synth
