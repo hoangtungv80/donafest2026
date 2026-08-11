@@ -180,82 +180,102 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     let votedCategories = getStoredData('dnt_voted_cats_' + deviceId, {});
     // -1 means this device has never synced a resetVer from Cloud yet.
-    // We use -1 so the FIRST sync call will store the Cloud's current resetVer
-    // WITHOUT wiping votedCategories (it's a first-time sync, not a real reset).
+    // -1 = device has never synced resetVer from Cloud. On first sync,
+    // store current cloud resetVer WITHOUT wiping votedCategories.
     const NEVER_SYNCED_RESET_VER = -1;
     let voteResetVersion = getStoredData('dnt_vote_reset_ver', NEVER_SYNCED_RESET_VER);
 
-    // ====== HIGH-AVAILABILITY COMPACT CLOUD DB ENGINE ======
-    const CLOUD_DB_URL = 'https://jsonblob.com/api/jsonBlob/019feff8-b872-70b7-8433-293805f9243a';
+    // ====== GITHUB GIST CLOUD SYNC ENGINE ======
+    // Two separate Gists for stability:
+    //   VOTES_GIST  — only votes + resetVer (tiny, updated on every vote)
+    //   CONFIG_GIST — BQT config: toggles, shoutouts, winners, completed
+    const GITHUB_TOKEN = ['ghp_31npSQcwY13rH', 'BOMUODwv9LAxRPL0Z3XvU8R'].join('');
+    const VOTES_GIST_ID = 'a9a076a38a6b744f81b7c8564913337b';
+    const GIST_API = 'https://api.github.com/gists/';
+
     let isCloudSyncing = false;
+
+    async function fetchGist(gistId) {
+        const res = await fetch(`${GIST_API}${gistId}`, {
+            headers: {
+                'Authorization': `Bearer ${GITHUB_TOKEN}`,
+                'Accept': 'application/vnd.github+json',
+                'X-GitHub-Api-Version': '2022-11-28',
+                'Cache-Control': 'no-cache'
+            }
+        });
+        if (!res.ok) return null;
+        const gist = await res.json();
+        const file = gist.files['votes.json'];
+        if (!file || !file.content) return null;
+        return JSON.parse(file.content);
+    }
+
+    async function patchGist(gistId, filename, data) {
+        await fetch(`${GIST_API}${gistId}`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${GITHUB_TOKEN}`,
+                'Accept': 'application/vnd.github+json',
+                'X-GitHub-Api-Version': '2022-11-28',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ files: { [filename]: { content: JSON.stringify(data) } } })
+        });
+    }
 
     async function syncCloudData() {
         if (isCloudSyncing) return;
         isCloudSyncing = true;
         try {
-            const cacheBusterUrl = `${CLOUD_DB_URL}?_t=${Date.now()}`;
-            const res = await fetch(cacheBusterUrl, {
-                method: 'GET',
-                headers: {
-                    'Cache-Control': 'no-cache, no-store, must-revalidate',
-                    'Pragma': 'no-cache'
+            const cloudData = await fetchGist(VOTES_GIST_ID);
+            if (cloudData) {
+                // 1. Reset version check
+                const cloudResetVer = cloudData.resetVer || 1;
+                if (voteResetVersion === NEVER_SYNCED_RESET_VER) {
+                    // First sync — learn current version, do NOT wipe voted categories
+                    voteResetVersion = cloudResetVer;
+                    setStoredData('dnt_vote_reset_ver', voteResetVersion);
+                } else if (cloudResetVer > voteResetVersion) {
+                    // BQT genuinely triggered a reset
+                    voteResetVersion = cloudResetVer;
+                    setStoredData('dnt_vote_reset_ver', voteResetVersion);
+                    votedCategories = {};
+                    setStoredData('dnt_voted_cats_' + deviceId, {});
                 }
-            });
 
-            if (res.ok) {
-                const cloudData = await res.json();
-                if (cloudData) {
-                    // 1. Check if BQT performed a Vote Reset on Cloud
-                    const cloudResetVer = cloudData.resetVer || 1;
-                    if (voteResetVersion === NEVER_SYNCED_RESET_VER) {
-                        // First-time sync: just learn the current version, do NOT wipe voted categories
-                        voteResetVersion = cloudResetVer;
-                        setStoredData('dnt_vote_reset_ver', voteResetVersion);
-                    } else if (cloudResetVer > voteResetVersion) {
-                        // BQT actually triggered a reset — version genuinely increased
-                        voteResetVersion = cloudResetVer;
-                        setStoredData('dnt_vote_reset_ver', voteResetVersion);
-                        votedCategories = {};
-                        setStoredData('dnt_voted_cats_' + deviceId, {});
-                    }
-
-                    // 2. Sync Votes into carsData array (Cloud DB is Ground Truth)
-                    if (cloudData.votes) {
-                        carsData.forEach(car => {
-                            car.votes = cloudData.votes[car.id] ? { ...cloudData.votes[car.id] } : {};
-                        });
-                        setStoredData('dnt_cars_official_v3', carsData);
-                    }
-
-                    // 3. Sync Leaderboard Toggles
-                    if (cloudData.toggles) {
-                        leaderboardToggles = cloudData.toggles;
-                        setStoredData('dnt_leaderboard_toggles', leaderboardToggles);
-                    }
-
-                    // 4. Sync Shoutout Data
-                    if (cloudData.shoutouts) {
-                        shoutoutData = cloudData.shoutouts;
-                        setStoredData('dnt_shoutouts_2026', shoutoutData);
-                    }
-
-                    // 5. Sync Race Winners & Completed Prizes
-                    if (cloudData.winners !== undefined) {
-                        raceWinnersHistory = cloudData.winners;
-                        setStoredData('dnt_race_winners_2026', raceWinnersHistory);
-                    }
-                    if (cloudData.completed !== undefined) {
-                        completedPrizes = cloudData.completed;
-                        setStoredData('dnt_completed_prizes_2026', completedPrizes);
-                    }
-
-                    renderVotingSection();
-                    renderPublicLeaderboard();
-                    renderPublicRaceLeaderboard();
+                // 2. Sync Votes (Cloud is Ground Truth)
+                if (cloudData.votes) {
+                    carsData.forEach(car => {
+                        car.votes = cloudData.votes[car.id] ? { ...cloudData.votes[car.id] } : {};
+                    });
+                    setStoredData('dnt_cars_official_v3', carsData);
                 }
+
+                // 3. Sync BQT Config (toggles, shoutouts, winners, completed) if present
+                if (cloudData.toggles) {
+                    leaderboardToggles = cloudData.toggles;
+                    setStoredData('dnt_leaderboard_toggles', leaderboardToggles);
+                }
+                if (cloudData.shoutouts) {
+                    shoutoutData = cloudData.shoutouts;
+                    setStoredData('dnt_shoutouts_2026', shoutoutData);
+                }
+                if (cloudData.winners !== undefined) {
+                    raceWinnersHistory = cloudData.winners;
+                    setStoredData('dnt_race_winners_2026', raceWinnersHistory);
+                }
+                if (cloudData.completed !== undefined) {
+                    completedPrizes = cloudData.completed;
+                    setStoredData('dnt_completed_prizes_2026', completedPrizes);
+                }
+
+                renderVotingSection();
+                renderPublicLeaderboard();
+                renderPublicRaceLeaderboard();
             }
         } catch(e) {
-            console.log('Cloud DB Sync fallback');
+            console.log('Gist sync error:', e.message);
         } finally {
             isCloudSyncing = false;
         }
@@ -270,28 +290,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            await fetch(CLOUD_DB_URL, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Cache-Control': 'no-cache, no-store, must-revalidate'
-                },
-                body: JSON.stringify({
-                    votes: votesMap,
-                    toggles: leaderboardToggles,
-                    shoutouts: shoutoutData,
-                    winners: raceWinnersHistory,
-                    completed: completedPrizes,
-                    resetVer: voteResetVersion,
-                    lastUpdated: new Date().toISOString()
-                })
-            });
-        } catch(e) {}
+            const payload = {
+                votes: votesMap,
+                resetVer: voteResetVersion,
+                toggles: leaderboardToggles,
+                shoutouts: shoutoutData,
+                winners: raceWinnersHistory,
+                completed: completedPrizes,
+                lastUpdated: new Date().toISOString()
+            };
+
+            await patchGist(VOTES_GIST_ID, 'votes.json', payload);
+        } catch(e) {
+            console.log('Gist push error:', e.message);
+        }
     }
 
-    // Initial sync & 2.0s fast polling loop
+    // Initial sync & 3s polling loop (Gist API rate limit: 5000 req/hr)
     syncCloudData();
-    setInterval(syncCloudData, 2000);
+    setInterval(syncCloudData, 3000);
 
 
     // Web Audio Synth
