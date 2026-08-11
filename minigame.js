@@ -1,6 +1,6 @@
 /* =============================================
    DONAFEST 2026 — Minigame & Arena Engine
-   11-Slide Sequential Race & 5-Panel Grand Showcase
+   Realtime Cloud Synchronization Engine (Multi-Device Shared Vote Counter)
    ============================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -179,6 +179,94 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('dnt_device_id', deviceId);
     }
     let votedCategories = getStoredData('dnt_voted_cats_' + deviceId, {});
+
+    // ====== REALTIME CLOUD DB SYNC ENGINE (restful-api.dev) ======
+    const CLOUD_DB_ID = 'ff8081819f7e10ae019fefeaa4fe234b';
+    const CLOUD_DB_URL = `https://api.restful-api.dev/objects/${CLOUD_DB_ID}`;
+    let isCloudSyncing = false;
+
+    function mergeCloudCars(localCars, cloudCars) {
+        if (!cloudCars || !Array.isArray(cloudCars)) return localCars;
+        return localCars.map(lCar => {
+            const cCar = cloudCars.find(c => c.id === lCar.id);
+            if (!cCar) return lCar;
+            const mergedVotes = { ...(lCar.votes || {}) };
+            if (cCar.votes) {
+                Object.keys(cCar.votes).forEach(catId => {
+                    mergedVotes[catId] = Math.max(mergedVotes[catId] || 0, cCar.votes[catId] || 0);
+                });
+            }
+            return { ...lCar, votes: mergedVotes };
+        });
+    }
+
+    async function syncCloudData() {
+        if (isCloudSyncing) return;
+        isCloudSyncing = true;
+        try {
+            const res = await fetch(CLOUD_DB_URL);
+            if (res.ok) {
+                const cloudObj = await res.json();
+                if (cloudObj && cloudObj.data) {
+                    const cData = cloudObj.data;
+
+                    if (cData.cars) {
+                        carsData = mergeCloudCars(carsData, cData.cars);
+                        setStoredData('dnt_cars_official_v3', carsData);
+                    }
+                    if (cData.leaderboardToggles) {
+                        leaderboardToggles = cData.leaderboardToggles;
+                        setStoredData('dnt_leaderboard_toggles', leaderboardToggles);
+                    }
+                    if (cData.shoutoutData) {
+                        shoutoutData = cData.shoutoutData;
+                        setStoredData('dnt_shoutouts_2026', shoutoutData);
+                    }
+                    if (cData.raceWinnersHistory && cData.raceWinnersHistory.length > 0) {
+                        raceWinnersHistory = cData.raceWinnersHistory;
+                        setStoredData('dnt_race_winners_2026', raceWinnersHistory);
+                    }
+                    if (cData.completedPrizes) {
+                        completedPrizes = cData.completedPrizes;
+                        setStoredData('dnt_completed_prizes_2026', completedPrizes);
+                    }
+
+                    renderVotingSection();
+                    renderPublicLeaderboard();
+                    renderPublicRaceLeaderboard();
+                }
+            }
+        } catch(e) {
+            console.log('Cloud DB Sync fallback');
+        } finally {
+            isCloudSyncing = false;
+        }
+    }
+
+    async function pushCloudData() {
+        try {
+            await fetch(CLOUD_DB_URL, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: 'DONAFEST_2026_VOTES',
+                    data: {
+                        cars: carsData,
+                        leaderboardToggles: leaderboardToggles,
+                        shoutoutData: shoutoutData,
+                        raceWinnersHistory: raceWinnersHistory,
+                        completedPrizes: completedPrizes,
+                        lastUpdated: new Date().toISOString()
+                    }
+                })
+            });
+        } catch(e) {}
+    }
+
+    // Initial sync & start 4s auto-polling
+    syncCloudData();
+    setInterval(syncCloudData, 4000);
+
 
     // Web Audio Synth
     let soundEnabled = true;
@@ -449,7 +537,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     winnerImg: park3Car ? park3Car.img : 'images/hero/hero (4).jpg'
                 });
             } else if (sec.id === 'race') {
-                // BUILD EXACTLY 11 SLIDES FOR DNT LUCKY RACE
                 const raceSlidesDef = [
                     { type: 'run', prizeKey: 'consolation', title: '🏎️ ĐUA GIẢI KHUYẾN KHÍCH (5 XE THẮNG)' },
                     { type: 'win', prizeKey: 'consolation', title: '🎁 VINH DANH CÁC XE THẮNG GIẢI KHUYẾN KHÍCH' },
@@ -567,7 +654,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (slide.isRaceSlide) {
-            // Interactive Race Track Slide (Slide 1, 3, 5, 7, 9)
             currentRacePrizeKey = slide.prizeKey;
             const prizeObj = racePrizesOrder.find(p => p.key === currentRacePrizeKey) || racePrizesOrder[0];
             const quota = prizeQuotas[currentRacePrizeKey] || 1;
@@ -599,7 +685,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     startBtn.addEventListener('click', (e) => {
                         e.preventDefault();
                         if (isFinished) {
-                            // Auto-advance to Winner Showcase Slide
                             if (currentSlideIndex < slideDeck.length - 1) {
                                 currentSlideIndex++;
                                 renderCurrentHeroSlide();
@@ -612,7 +697,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 100);
 
         } else if (slide.isRaceWinnerSlide) {
-            // Winner Showcase Slide (Slide 2, 4, 6, 8, 10)
             const prizeObj = racePrizesOrder.find(p => p.key === slide.prizeKey) || racePrizesOrder[0];
             const prizeWinners = raceWinnersHistory.filter(w => w.prize.includes(prizeObj.name) || w.prize === prizeObj.name);
 
@@ -663,7 +747,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 100);
 
         } else if (slide.isRaceGrandSummarySlide) {
-            // Slide 11: 5-Panel Grand Showcase Slide
             stageSlideContent.innerHTML = `
                 <div class="stage-race-container" style="max-width:1250px;">
                     <div class="hero-award-badge" style="font-size:1.3rem;">👑 BẢNG VÀNG TỔNG HỢP DNT LUCKY RACE 2026</div>
@@ -686,7 +769,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 100);
 
         } else {
-            // Standard Voting / Shoutout / Parking Hero Winner Slide
             stageSlideContent.innerHTML = `
                 <div class="stage-hero-winner-card">
                     <div class="hero-award-badge">${slide.slideTitle}</div>
@@ -868,6 +950,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setStoredData('dnt_cars_official_v3', carsData);
         setStoredData('dnt_voted_cats_' + deviceId, votedCategories);
+
+        // Push real-time vote to Cloud DB immediately
+        pushCloudData();
 
         playSound('go');
         alert(`🎉 Cảm ơn bạn! Đã bình chọn thành công cho [${car.model} - ${car.name}] trong hạng mục!`);
@@ -1072,9 +1157,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const prizeInfo = getCurrentPrizeInfo();
 
-        // SINGLE RUN RULE: Check if prize has already been run & completed
         if (completedPrizes[prizeInfo.key]) {
-            // Auto advance to Winner Showcase slide if already finished
             if (currentSlideIndex < slideDeck.length - 1) {
                 currentSlideIndex++;
                 renderCurrentHeroSlide();
@@ -1090,7 +1173,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const N = prizeInfo.quota;
 
-        // FAIR UNIQUE WINNERS RULE: Filter out cars that ALREADY WON any prize previously
         const alreadyWonCarIds = new Set(raceWinnersHistory.map(w => w.carId || w.name));
         const eligibleCars = raceCars.filter(c => !alreadyWonCarIds.has(c.id) && !alreadyWonCarIds.has(c.name));
 
@@ -1162,7 +1244,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const prizeInfo = getCurrentPrizeInfo();
         const winners = selectedWinnersForCurrentRace;
 
-        // Mark current prize category as COMPLETED (Single-Run Enforcement)
         completedPrizes[prizeInfo.key] = true;
         setStoredData('dnt_completed_prizes_2026', completedPrizes);
 
@@ -1177,9 +1258,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
         setStoredData('dnt_race_winners_2026', raceWinnersHistory);
+
+        // Push real-time race results to Cloud DB
+        pushCloudData();
         renderPublicRaceLeaderboard();
 
-        // AUTO-ADVANCE TO THE WINNER SHOWCASE SLIDE IMMEDIATELY!
         setTimeout(() => {
             if (currentSlideIndex < slideDeck.length - 1) {
                 currentSlideIndex++;
@@ -1275,6 +1358,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     racePrizesOrder[idx - 1] = temp;
                     setStoredData('dnt_race_prizes_order', racePrizesOrder);
                     renderRacePrizesOrderList();
+                    pushCloudData();
                 }
             });
         });
@@ -1288,6 +1372,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     racePrizesOrder[idx + 1] = temp;
                     setStoredData('dnt_race_prizes_order', racePrizesOrder);
                     renderRacePrizesOrderList();
+                    pushCloudData();
                 }
             });
         });
@@ -1313,6 +1398,7 @@ document.addEventListener('DOMContentLoaded', () => {
             prizeQuotas.consolation = parseInt(document.getElementById('quotaConsolation').value) || 5;
 
             setStoredData('dnt_prize_quotas', prizeQuotas);
+            pushCloudData();
             alert('💾 Đã lưu cấu hình số lượng giải thưởng thành công!');
         });
     }
@@ -1339,8 +1425,9 @@ document.addEventListener('DOMContentLoaded', () => {
             shoutoutData.parking3 = document.getElementById('adminPark3').value.trim();
 
             setStoredData('dnt_shoutouts_2026', shoutoutData);
+            pushCloudData();
             renderPublicLeaderboard();
-            alert('💾 Đã cập nhật và lưu thông tin Vinh Danh thành công!');
+            alert('💾 Đã cập nhật và đồng bộ Cloud thông tin Vinh Danh thành công!');
         });
     }
 
@@ -1373,6 +1460,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const key = e.target.getAttribute('data-key');
                 leaderboardToggles[key] = e.target.checked;
                 setStoredData('dnt_leaderboard_toggles', leaderboardToggles);
+                pushCloudData();
                 renderPublicLeaderboard();
                 renderVotingSection();
             });
@@ -1405,6 +1493,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     setStoredData('dnt_categories_order', categoriesList);
                     renderCategoriesOrderList();
                     renderVotingCategoriesNav();
+                    pushCloudData();
                 }
             });
         });
@@ -1419,6 +1508,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     setStoredData('dnt_categories_order', categoriesList);
                     renderCategoriesOrderList();
                     renderVotingCategoriesNav();
+                    pushCloudData();
                 }
             });
         });
@@ -1449,6 +1539,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     presentationOrder[idx - 1] = temp;
                     setStoredData('dnt_presentation_order', presentationOrder);
                     renderPresentationOrderList();
+                    pushCloudData();
                 }
             });
         });
@@ -1462,6 +1553,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     presentationOrder[idx + 1] = temp;
                     setStoredData('dnt_presentation_order', presentationOrder);
                     renderPresentationOrderList();
+                    pushCloudData();
                 }
             });
         });
@@ -1471,17 +1563,19 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         carsData = [...OFFICIAL_25_CARS];
         setStoredData('dnt_cars_official_v3', carsData);
+        pushCloudData();
         renderVotingSection();
         alert('✅ Đã khôi phục danh sách 25 thí sinh gốc!');
     });
 
     document.getElementById('adminResetVotesBtn')?.addEventListener('click', (e) => {
         e.preventDefault();
-        if (confirm('⚠️ Reset toàn bộ lượt bình chọn về 0?')) {
+        if (confirm('⚠️ Reset toàn bộ lượt bình chọn về 0 trên Cloud và tất cả thiết bị?')) {
             carsData.forEach(c => c.votes = {});
             setStoredData('dnt_cars_official_v3', carsData);
+            pushCloudData();
             renderVotingSection();
-            alert('✅ Đã reset tất cả lượt bình chọn!');
+            alert('✅ Đã reset đồng bộ Cloud tất cả lượt bình chọn!');
         }
     });
 
@@ -1494,10 +1588,11 @@ document.addEventListener('DOMContentLoaded', () => {
             currentRacePrizeKey = 'consolation';
             setStoredData('dnt_race_winners_2026', raceWinnersHistory);
             setStoredData('dnt_completed_prizes_2026', completedPrizes);
+            pushCloudData();
             renderPublicRaceLeaderboard();
             renderPublicLeaderboard();
             renderRacePrizesOrderList();
-            alert('✅ Đã reset thành công toàn bộ kết quả DNT Lucky Race!');
+            alert('✅ Đã reset đồng bộ Cloud toàn bộ kết quả DNT Lucky Race!');
         }
     });
 
