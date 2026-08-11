@@ -1,6 +1,6 @@
 /* =============================================
    DONAFEST 2026 — Minigame & Arena Engine
-   Realtime Cloud Synchronization Engine (Multi-Device Ground Truth & Vote Lock Reset)
+   Realtime Cloud Synchronization Engine (High-Availability & Cache-Busting Sync)
    ============================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -181,21 +181,29 @@ document.addEventListener('DOMContentLoaded', () => {
     let votedCategories = getStoredData('dnt_voted_cats_' + deviceId, {});
     let voteResetVersion = getStoredData('dnt_vote_reset_ver', 0);
 
-    // ====== REALTIME CLOUD DB SYNC ENGINE ======
-    const CLOUD_DB_ID = 'ff8081819f7e10ae019fefeaa4fe234b';
-    const CLOUD_DB_URL = `https://api.restful-api.dev/objects/${CLOUD_DB_ID}`;
+    // ====== HIGH-AVAILABILITY REALTIME CLOUD DB ENGINE ======
+    const CLOUD_DB_URL = 'https://crudcrud.com/api/9d06d9b08bf14b689aba1ae9f9b4cdc1/votes/6a7ade2a1bcc1103e818ab28';
     let isCloudSyncing = false;
 
     async function syncCloudData() {
         if (isCloudSyncing) return;
         isCloudSyncing = true;
         try {
-            const res = await fetch(CLOUD_DB_URL);
+            // Append timestamp cache buster query + no-cache headers so browsers NEVER return stale cached data
+            const cacheBusterUrl = `${CLOUD_DB_URL}?_t=${Date.now()}`;
+            const res = await fetch(cacheBusterUrl, {
+                method: 'GET',
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache'
+                }
+            });
+
             if (res.ok) {
                 const cloudObj = await res.json();
-                if (cloudObj && cloudObj.data) {
-                    const cData = cloudObj.data;
+                const cData = cloudObj.data || cloudObj;
 
+                if (cData) {
                     // 1. Check if BQT performed a Vote Reset on Cloud
                     if (cData.voteResetVersion && cData.voteResetVersion > voteResetVersion) {
                         voteResetVersion = cData.voteResetVersion;
@@ -248,7 +256,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             await fetch(CLOUD_DB_URL, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache, no-store, must-revalidate'
+                },
                 body: JSON.stringify({
                     name: 'DONAFEST_2026_VOTES',
                     data: {
@@ -265,9 +276,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch(e) {}
     }
 
-    // Initial sync & start 2.5s auto-polling for instant multi-device synchronization
+    // Initial sync & start 3.0s auto-polling for instant multi-device synchronization
     syncCloudData();
-    setInterval(syncCloudData, 2500);
+    setInterval(syncCloudData, 3000);
 
 
     // Web Audio Synth
@@ -947,13 +958,21 @@ document.addEventListener('DOMContentLoaded', () => {
         votedCategories[catId] = carId;
         setStoredData('dnt_voted_cats_' + deviceId, votedCategories);
 
-        // Fetch fresh Cloud DB votes to get latest state before incrementing
+        // Fetch fresh Cloud DB votes with cache buster query parameter + headers
         try {
-            const res = await fetch(CLOUD_DB_URL);
+            const cacheBusterUrl = `${CLOUD_DB_URL}?_t=${Date.now()}`;
+            const res = await fetch(cacheBusterUrl, {
+                method: 'GET',
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache'
+                }
+            });
             if (res.ok) {
                 const cloudObj = await res.json();
-                if (cloudObj && cloudObj.data && Array.isArray(cloudObj.data.cars)) {
-                    carsData = cloudObj.data.cars;
+                const cData = cloudObj.data || cloudObj;
+                if (cData && Array.isArray(cData.cars)) {
+                    carsData = cData.cars;
                 }
             }
         } catch(e) {}
