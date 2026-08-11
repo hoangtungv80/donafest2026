@@ -161,14 +161,16 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'race', name: '🏎️ DNT Lucky Race (11 Slides)' }
     ]);
 
-    let shoutoutData = getStoredData('dnt_shoutouts_2026', {
-        garage: 'Garage DNT Performance',
-        legend: 'BMW 640i F06 (Hoàng Tùng)',
-        passionate: 'Trịnh Quốc Trung (BQT DONAFEST 2026)',
-        parking1: 'DNT-01 • Hoàng Tùng',
-        parking2: 'DNT-02 • Trịnh Quốc Trung',
-        parking3: 'DNT-03 • Ngô Quang Nghĩa'
-    });
+    const DEFAULT_AWARDS = [
+        { id: 'award-1', title: 'Garage Làm Cho Vui Nhất', carId: 'car-1' },
+        { id: 'award-2', title: 'DNT Legend (Xe Kì Cựu)', carId: 'car-1' },
+        { id: 'award-3', title: 'DNT Passionate (Tâm Huyết)', carId: 'car-2' },
+        { id: 'award-4', title: 'Giải Nhất Đỗ Xe Nghệ Thuật', carId: 'car-1' },
+        { id: 'award-5', title: 'Giải Nhì Đỗ Xe Nghệ Thuật', carId: 'car-2' },
+        { id: 'award-6', title: 'Giải Ba Đỗ Xe Nghệ Thuật', carId: 'car-3' }
+    ];
+
+    let awardsConfig = getStoredData('dnt_awards_config_2026', DEFAULT_AWARDS);
 
     let raceWinnersHistory = getStoredData('dnt_race_winners_2026', []);
 
@@ -219,12 +221,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const cloudData = await fbGet('');
             if (!cloudData) { isCloudSyncing = false; return; }
 
-            // 1. Reset version check
+            // 1. Reset version check — if cloud resetVer is higher or first sync, sync & reset lock if needed
             const cloudResetVer = cloudData.resetVer || 1;
-            if (voteResetVersion === NEVER_SYNCED_RESET_VER) {
-                voteResetVersion = cloudResetVer;
-                setStoredData('dnt_vote_reset_ver', voteResetVersion);
-            } else if (cloudResetVer > voteResetVersion) {
+            if (voteResetVersion === NEVER_SYNCED_RESET_VER || cloudResetVer > voteResetVersion) {
                 voteResetVersion = cloudResetVer;
                 setStoredData('dnt_vote_reset_ver', voteResetVersion);
                 votedCategories = {};
@@ -243,9 +242,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 leaderboardToggles = cloudData.toggles;
                 setStoredData('dnt_leaderboard_toggles', leaderboardToggles);
             }
-            if (cloudData.shoutouts) {
-                shoutoutData = cloudData.shoutouts;
-                setStoredData('dnt_shoutouts_2026', shoutoutData);
+            if (cloudData.awardsConfig !== undefined) {
+                awardsConfig = Array.isArray(cloudData.awardsConfig) ? cloudData.awardsConfig : DEFAULT_AWARDS;
+                setStoredData('dnt_awards_config_2026', awardsConfig);
             }
             if (cloudData.winners !== undefined) {
                 raceWinnersHistory = Array.isArray(cloudData.winners) ? cloudData.winners : [];
@@ -275,13 +274,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Push BQT config (toggles, shoutouts, race results, etc.)
+    // Push BQT config (toggles, awards, race results, etc.)
     async function pushCloudData() {
         try {
             await fbPatch('', {
                 resetVer: voteResetVersion,
                 toggles: leaderboardToggles,
-                shoutouts: shoutoutData,
+                awardsConfig: awardsConfig,
                 winners: raceWinnersHistory,
                 completed: completedPrizes
             });
@@ -457,143 +456,91 @@ document.addEventListener('DOMContentLoaded', () => {
     function buildPresentationDeck() {
         const deck = [];
 
-        presentationOrder.forEach((sec, secIdx) => {
-            if (sec.id === 'voting') {
-                categoriesList.forEach((cat, catIdx) => {
-                    const topCar = [...carsData].sort((a,b) => (b.votes ? (b.votes[cat.id]||0) : 0) - (a.votes ? (a.votes[cat.id]||0) : 0))[0];
-                    const voteCount = topCar ? (topCar.votes ? (topCar.votes[cat.id]||0) : 0) : 0;
-                    deck.push({
-                        sectionIndex: secIdx,
-                        sectionId: 'voting',
-                        sectionName: `Phần ${secIdx + 1}/${presentationOrder.length}: 🏆 CỔNG BÌNH CHỌN`,
-                        slideInSecIndex: catIdx,
-                        slidesInSecTotal: categoriesList.length,
-                        slideTitle: `${cat.icon} GIẢI BÌNH CHỌN: ${cat.title.toUpperCase()}`,
-                        awardDesc: cat.desc,
-                        winnerName: topCar ? topCar.name : 'Chưa có bình chọn',
-                        winnerModel: topCar ? topCar.model : '',
-                        winnerPlate: topCar ? topCar.plate : '',
-                        winnerImg: topCar ? topCar.img : 'images/donafest.jpg',
-                        voteCount: voteCount
-                    });
-                });
-            } else if (sec.id === 'shoutout') {
-                const garageCar = carsData.find(c => shoutoutData.garage.includes(c.name) || shoutoutData.garage.includes(c.model)) || carsData[0];
+        // 3 SECTIONS FOR PRESENTATION STAGE
+        // SECTION 1: LEADERBOARD VINH DANH (Dynamic Awards)
+        const totalVinhSlides = awardsConfig.length > 0 ? awardsConfig.length : 1;
+        if (awardsConfig.length === 0) {
+            deck.push({
+                sectionIndex: 0,
+                sectionId: 'shoutout',
+                sectionName: 'Phần 1/3: 👑 LEADERBOARD VINH DANH',
+                slideInSecIndex: 0,
+                slidesInSecTotal: 1,
+                slideTitle: '👑 LEADERBOARD VINH DANH',
+                awardDesc: 'Chưa cấu hình giải vinh danh nào.',
+                winnerName: 'Chưa công bố',
+                winnerModel: '',
+                winnerPlate: '',
+                winnerImg: 'images/donafest.jpg'
+            });
+        } else {
+            awardsConfig.forEach((award, idx) => {
+                const car = carsData.find(c => c.id === award.carId);
                 deck.push({
-                    sectionIndex: secIdx,
+                    sectionIndex: 0,
                     sectionId: 'shoutout',
-                    sectionName: `Phần ${secIdx + 1}/${presentationOrder.length}: 👑 LEADERBOARD VINH DANH`,
-                    slideInSecIndex: 0,
-                    slidesInSecTotal: 3,
-                    slideTitle: '🏬 GARAGE LÀM CHO VUI NHẤT',
-                    awardDesc: 'Hỗ trợ nhiệt tình nhất cho anh em DONATEAM tại Donafest 2026',
-                    winnerName: shoutoutData.garage || 'Chưa công bố',
-                    winnerModel: garageCar ? garageCar.model : '',
-                    winnerPlate: garageCar ? garageCar.plate : '',
-                    winnerImg: garageCar ? garageCar.img : 'images/venue.jpg'
+                    sectionName: 'Phần 1/3: 👑 LEADERBOARD VINH DANH',
+                    slideInSecIndex: idx,
+                    slidesInSecTotal: totalVinhSlides,
+                    slideTitle: `🏆 ${award.title.toUpperCase()}`,
+                    awardDesc: 'Giải thưởng vinh danh chính thức tại Donafest 2026',
+                    winnerName: car ? car.name : 'Chưa công bố',
+                    winnerModel: car ? car.model : '',
+                    winnerPlate: car ? car.plate : '',
+                    winnerImg: car ? car.img : 'images/donafest.jpg'
                 });
-                const legendCar = carsData.find(c => shoutoutData.legend.includes(c.name) || shoutoutData.legend.includes(c.model)) || carsData[0];
-                deck.push({
-                    sectionIndex: secIdx,
-                    sectionId: 'shoutout',
-                    sectionName: `Phần ${secIdx + 1}/${presentationOrder.length}: 👑 LEADERBOARD VINH DANH`,
-                    slideInSecIndex: 1,
-                    slidesInSecTotal: 3,
-                    slideTitle: '👑 DNT LEGEND',
-                    awardDesc: 'Chiếc xe kì cựu & biểu tượng của DONATEAM',
-                    winnerName: shoutoutData.legend || 'Chưa công bố',
-                    winnerModel: legendCar ? legendCar.model : '',
-                    winnerPlate: legendCar ? legendCar.plate : '',
-                    winnerImg: legendCar ? legendCar.img : 'images/hero/hero (1).jpg'
-                });
-                const passCar = carsData.find(c => shoutoutData.passionate.includes(c.name)) || carsData[1];
-                deck.push({
-                    sectionIndex: secIdx,
-                    sectionId: 'shoutout',
-                    sectionName: `Phần ${secIdx + 1}/${presentationOrder.length}: 👑 LEADERBOARD VINH DANH`,
-                    slideInSecIndex: 2,
-                    slidesInSecTotal: 3,
-                    slideTitle: '🔥 DNT PASSIONATE',
-                    awardDesc: 'Thành viên tâm huyết đóng góp nhất cho Donafest 2026',
-                    winnerName: shoutoutData.passionate || 'Chưa công bố',
-                    winnerModel: passCar ? passCar.model : '',
-                    winnerPlate: passCar ? passCar.plate : '',
-                    winnerImg: passCar ? passCar.img : 'images/donagala.jpg'
-                });
-            } else if (sec.id === 'parking') {
-                const park1Car = carsData.find(c => shoutoutData.parking1.includes(c.name) || shoutoutData.parking1.includes(c.plate)) || carsData[0];
-                deck.push({
-                    sectionIndex: secIdx,
-                    sectionId: 'parking',
-                    sectionName: `Phần ${secIdx + 1}/${presentationOrder.length}: 🅿️ ĐỖ XE NGHỆ THUẬT`,
-                    slideInSecIndex: 0,
-                    slidesInSecTotal: 3,
-                    slideTitle: '🥇 GIẢI NHẤT CUỘC THI ĐỖ XE',
-                    awardDesc: 'Kỹ năng làm chủ tay lái và đỗ xe đỉnh cao nhất',
-                    winnerName: shoutoutData.parking1 || 'Chưa công bố',
-                    winnerModel: park1Car ? park1Car.model : '',
-                    winnerPlate: park1Car ? park1Car.plate : '',
-                    winnerImg: park1Car ? park1Car.img : 'images/hero/hero (2).jpg'
-                });
-                const park2Car = carsData.find(c => shoutoutData.parking2.includes(c.name) || shoutoutData.parking2.includes(c.plate)) || carsData[1];
-                deck.push({
-                    sectionIndex: secIdx,
-                    sectionId: 'parking',
-                    sectionName: `Phần ${secIdx + 1}/${presentationOrder.length}: 🅿️ ĐỖ XE NGHỆ THUẬT`,
-                    slideInSecIndex: 1,
-                    slidesInSecTotal: 3,
-                    slideTitle: '🥈 GIẢI NHÌ CUỘC THI ĐỖ XE',
-                    awardDesc: 'Á Quân Kỹ năng đỗ xe nghệ thuật',
-                    winnerName: shoutoutData.parking2 || 'Chưa công bố',
-                    winnerModel: park2Car ? park2Car.model : '',
-                    winnerPlate: park2Car ? park2Car.plate : '',
-                    winnerImg: park2Car ? park2Car.img : 'images/hero/hero (3).jpg'
-                });
-                const park3Car = carsData.find(c => shoutoutData.parking3.includes(c.name) || shoutoutData.parking3.includes(c.plate)) || carsData[2];
-                deck.push({
-                    sectionIndex: secIdx,
-                    sectionId: 'parking',
-                    sectionName: `Phần ${secIdx + 1}/${presentationOrder.length}: 🅿️ ĐỖ XE NGHỆ THUẬT`,
-                    slideInSecIndex: 2,
-                    slidesInSecTotal: 3,
-                    slideTitle: '🥉 GIẢI BA CUỘC THI ĐỖ XE',
-                    awardDesc: 'Hạng Ba Kỹ năng đỗ xe nghệ thuật',
-                    winnerName: shoutoutData.parking3 || 'Chưa công bố',
-                    winnerModel: park3Car ? park3Car.model : '',
-                    winnerPlate: park3Car ? park3Car.plate : '',
-                    winnerImg: park3Car ? park3Car.img : 'images/hero/hero (4).jpg'
-                });
-            } else if (sec.id === 'race') {
-                const raceSlidesDef = [
-                    { type: 'run', prizeKey: 'consolation', title: '🏎️ ĐUA GIẢI KHUYẾN KHÍCH (5 XE THẮNG)' },
-                    { type: 'win', prizeKey: 'consolation', title: '🎁 VINH DANH CÁC XE THẮNG GIẢI KHUYẾN KHÍCH' },
-                    { type: 'run', prizeKey: 'third', title: '🏎️ ĐUA GIẢI BA (3 XE THẮNG)' },
-                    { type: 'win', prizeKey: 'third', title: '🥉 VINH DANH CÁC XE THẮNG GIẢI BA' },
-                    { type: 'run', prizeKey: 'second', title: '🏎️ ĐUA GIẢI NHÌ (2 XE THẮNG)' },
-                    { type: 'win', prizeKey: 'second', title: '🥈 VINH DANH CÁC XE THẮNG GIẢI NHÌ' },
-                    { type: 'run', prizeKey: 'first', title: '🏎️ ĐUA GIẢI NHẤT (1 XE THẮNG)' },
-                    { type: 'win', prizeKey: 'first', title: '🥇 VINH DANH XE THẮNG GIẢI NHẤT' },
-                    { type: 'run', prizeKey: 'special', title: '🏎️ ĐUA GIẢI ĐẶC BIỆT (1 XE THẮNG)' },
-                    { type: 'win', prizeKey: 'special', title: '🏆 VINH DANH XE THẮNG GIẢI ĐẶC BIỆT' },
-                    { type: 'grand_summary', title: '👑 BẢNG VÀNG TỔNG HỢP DNT LUCKY RACE 2026' }
-                ];
+            });
+        }
 
-                raceSlidesDef.forEach((def, rIdx) => {
-                    deck.push({
-                        sectionIndex: secIdx,
-                        sectionId: 'race',
-                        sectionName: `Phần ${secIdx + 1}/${presentationOrder.length}: 🏎️ DNT LUCKY RACE`,
-                        slideInSecIndex: rIdx,
-                        slidesInSecTotal: 11,
-                        slideTitle: def.title,
-                        isRaceSlide: def.type === 'run',
-                        isRaceWinnerSlide: def.type === 'win',
-                        isRaceGrandSummarySlide: def.type === 'grand_summary',
-                        prizeKey: def.prizeKey,
-                        winnerImg: 'images/venue.jpg'
-                    });
-                });
-            }
+        // SECTION 2: KẾT QUẢ BÌNH CHỌN (12 Hạng Mục - Includes Ties)
+        categoriesList.forEach((cat, catIdx) => {
+            const maxVotes = Math.max(...carsData.map(c => c.votes ? (c.votes[cat.id] || 0) : 0));
+            const topCars = maxVotes > 0 ? carsData.filter(c => (c.votes ? (c.votes[cat.id] || 0) : 0) === maxVotes) : [];
+
+            deck.push({
+                sectionIndex: 1,
+                sectionId: 'voting',
+                sectionName: 'Phần 2/3: 🏆 KẾT QUẢ BÌNH CHỌN',
+                slideInSecIndex: catIdx,
+                slidesInSecTotal: categoriesList.length,
+                slideTitle: `${cat.icon} GIẢI BÌNH CHỌN: ${cat.title.toUpperCase()}`,
+                awardDesc: cat.desc,
+                isVoteResultSlide: true,
+                topCars: topCars,
+                voteCount: maxVotes,
+                winnerImg: topCars[0] ? topCars[0].img : 'images/donafest.jpg'
+            });
+        });
+
+        // SECTION 3: DNT LUCKY RACE (11 Slides)
+        const raceSlidesDef = [
+            { type: 'run', prizeKey: 'consolation', title: '🏎️ ĐUA GIẢI KHUYẾN KHÍCH (5 XE THẮNG)' },
+            { type: 'win', prizeKey: 'consolation', title: '🎁 VINH DANH CÁC XE THẮNG GIẢI KHUYẾN KHÍCH' },
+            { type: 'run', prizeKey: 'third', title: '🏎️ ĐUA GIẢI BA (3 XE THẮNG)' },
+            { type: 'win', prizeKey: 'third', title: '🥉 VINH DANH CÁC XE THẮNG GIẢI BA' },
+            { type: 'run', prizeKey: 'second', title: '🏎️ ĐUA GIẢI NHÌ (2 XE THẮNG)' },
+            { type: 'win', prizeKey: 'second', title: '🥈 VINH DANH CÁC XE THẮNG GIẢI NHÌ' },
+            { type: 'run', prizeKey: 'first', title: '🏎️ ĐUA GIẢI NHẤT (1 XE THẮNG)' },
+            { type: 'win', prizeKey: 'first', title: '🥇 VINH DANH XE THẮNG GIẢI NHẤT' },
+            { type: 'run', prizeKey: 'special', title: '🏎️ ĐUA GIẢI ĐẶC BIỆT (1 XE THẮNG)' },
+            { type: 'win', prizeKey: 'special', title: '🏆 VINH DANH XE THẮNG GIẢI ĐẶC BIỆT' },
+            { type: 'grand_summary', title: '👑 BẢNG VÀNG TỔNG HỢP DNT LUCKY RACE 2026' }
+        ];
+
+        raceSlidesDef.forEach((def, rIdx) => {
+            deck.push({
+                sectionIndex: 2,
+                sectionId: 'race',
+                sectionName: 'Phần 3/3: 🏎️ DNT LUCKY RACE',
+                slideInSecIndex: rIdx,
+                slidesInSecTotal: 11,
+                slideTitle: def.title,
+                isRaceSlide: def.type === 'run',
+                isRaceWinnerSlide: def.type === 'win',
+                isRaceGrandSummarySlide: def.type === 'grand_summary',
+                prizeKey: def.prizeKey,
+                winnerImg: 'images/venue.jpg'
+            });
         });
 
         return deck;
@@ -795,6 +742,52 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }, 100);
 
+        } else if (slide.isVoteResultSlide) {
+            const topCars = slide.topCars || [];
+            const voteCount = slide.voteCount || 0;
+
+            let winnersHtml = '';
+            if (topCars.length === 0) {
+                winnersHtml = `<p style="font-size:1.2rem; color:var(--text-muted); padding:40px;">Chưa có lượt bình chọn cho hạng mục này.</p>`;
+            } else if (topCars.length === 1) {
+                const car = topCars[0];
+                winnersHtml = `
+                    <h1 class="hero-winner-name">${car.name}</h1>
+                    <div class="hero-winner-img-frame" style="max-width:420px; margin:15px auto;">
+                        <img src="${car.img}" alt="${car.name}" class="hero-winner-img" onerror="this.src='images/donafest.jpg'">
+                    </div>
+                    <div class="hero-car-model">🏎️ ${car.model}</div>
+                    <div class="hero-car-plate">🏷️ Mã số: ${car.plate}</div>
+                    <div class="hero-vote-count">👍 ${voteCount} Lượt Vote Bình Chọn</div>
+                `;
+            } else {
+                winnersHtml = `
+                    <div style="font-size:1.1rem; color:var(--gold); font-weight:800; margin-bottom:15px;">
+                        🔥 ĐỒNG HẠNG NHẤT (${voteCount} Votes) - XIN CHÚC MỪNG ${topCars.length} THÍ SINH
+                    </div>
+                    <div class="hero-winners-list-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; width:100%;">
+                        ${topCars.map(car => `
+                            <div class="glass-card" style="padding:14px; text-align:center; border:2px solid var(--gold); background:rgba(12,11,26,0.9);">
+                                <div style="width:100%; height:140px; border-radius:10px; overflow:hidden; margin-bottom:10px;">
+                                    <img src="${car.img}" alt="${car.name}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='images/donafest.jpg'">
+                                </div>
+                                <div style="font-weight:800; color:#fff; font-size:1.05rem;">${car.name}</div>
+                                <div style="font-size:0.85rem; color:var(--teal); font-weight:700; margin:2px 0;">🏎️ ${car.model}</div>
+                                <div style="font-size:0.8rem; color:var(--text-secondary);">🏷️ Mã số: ${car.plate}</div>
+                                <div style="font-size:0.85rem; color:var(--gold); font-weight:700; margin-top:4px;">👍 ${voteCount} Votes</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            stageSlideContent.innerHTML = `
+                <div class="stage-hero-winner-card" style="max-width:950px;">
+                    <div class="hero-award-badge">${slide.slideTitle}</div>
+                    ${winnersHtml}
+                    <p class="card-sub-hint margin-top-20" style="font-size:1rem; color:var(--text-secondary);">${slide.awardDesc || ''}</p>
+                </div>
+            `;
         } else {
             stageSlideContent.innerHTML = `
                 <div class="stage-hero-winner-card">
@@ -1014,45 +1007,72 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let html = '';
 
-            if (leaderboardToggles.garage) {
-                html += `<div class="glass-card shoutout-card"><h3>🏬 Garage Làm Cho Vui Nhất</h3><p class="shoutout-winner-box">${shoutoutData.garage || 'Chưa công bố'}</p></div>`;
-            }
-            if (leaderboardToggles.legend) {
-                html += `<div class="glass-card shoutout-card"><h3>👑 DNT Legend</h3><p class="shoutout-winner-box">${shoutoutData.legend || 'Chưa công bố'}</p></div>`;
-            }
-            if (leaderboardToggles.passionate) {
-                html += `<div class="glass-card shoutout-card"><h3>🔥 DNT Passionate</h3><p class="shoutout-winner-box">${shoutoutData.passionate || 'Chưa công bố'}</p></div>`;
-            }
-
-            if (leaderboardToggles.parking) {
+            // 1. Dynamic Awards (Vinh Danh)
+            if (leaderboardToggles.vinhdanh && awardsConfig.length > 0) {
                 html += `
-                    <div class="glass-card parking-awards-container" style="grid-column: 1 / -1;">
-                        <h3>🅿️ KẾT QUẢ CUỘC THI ĐỖ XE</h3>
-                        <p>🥇 Nhất: ${shoutoutData.parking1 || 'Chưa công bố'} | 🥈 Nhì: ${shoutoutData.parking2 || 'Chưa công bố'} | 🥉 Ba: ${shoutoutData.parking3 || 'Chưa công bố'}</p>
+                    <div class="glass-card" style="grid-column: 1 / -1; background: rgba(12, 11, 26, 0.9); border: 2px solid var(--gold); margin-bottom: 20px;">
+                        <h2 style="color: var(--gold); text-align: center; margin-bottom: 20px; font-size: 1.5rem;">👑 BẢNG VÀNG VINH DANH SỰ KIỆN</h2>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+                            ${awardsConfig.map(award => {
+                                const car = carsData.find(c => c.id === award.carId);
+                                const imgPath = car ? car.img : 'images/donafest.jpg';
+                                const nameText = car ? car.name : 'Chưa công bố';
+                                const modelText = car ? `🏎️ ${car.model}` : '';
+                                const plateText = car ? `🏷️ Mã số: ${car.plate}` : '';
+
+                                return `
+                                    <div class="glass-card" style="padding: 16px; text-align: center; border: 1px solid var(--teal); background: rgba(0, 0, 0, 0.5);">
+                                        <div style="font-size: 0.85rem; color: var(--gold); font-weight: 800; text-transform: uppercase; margin-bottom: 8px;">🏆 ${award.title}</div>
+                                        <div style="width: 100%; height: 160px; border-radius: 10px; overflow: hidden; margin-bottom: 12px;">
+                                            <img src="${imgPath}" alt="${nameText}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='images/donafest.jpg'">
+                                        </div>
+                                        <div style="font-weight: 800; color: #fff; font-size: 1.1rem;">${nameText}</div>
+                                        <div style="font-size: 0.88rem; color: var(--teal); font-weight: 700; margin: 3px 0;">${modelText}</div>
+                                        <div style="font-size: 0.8rem; color: var(--text-secondary);">${plateText}</div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
                     </div>
                 `;
             }
 
+            // 2. Voting Category Results (Handles Ties)
             categoriesList.forEach(cat => {
                 if (leaderboardToggles[cat.id]) {
-                    const topCar = [...carsData].sort((a,b) => (b.votes ? (b.votes[cat.id]||0) : 0) - (a.votes ? (a.votes[cat.id]||0) : 0))[0];
+                    const maxVotes = Math.max(...carsData.map(c => c.votes ? (c.votes[cat.id] || 0) : 0));
+                    const topCars = maxVotes > 0 ? carsData.filter(c => (c.votes ? (c.votes[cat.id] || 0) : 0) === maxVotes) : [];
+
                     html += `
-                        <div class="glass-card shoutout-card">
-                            <div class="shoutout-badge">${cat.icon} GIẢI BÌNH CHỌN</div>
-                            <h3>${cat.title}</h3>
-                            <p class="shoutout-winner-box">🏆 ${topCar ? `${topCar.model} (${topCar.name})` : 'Chưa có vote'}</p>
+                        <div class="glass-card category-leaderboard-card">
+                            <div class="cat-card-header">
+                                <span class="cat-icon-md">${cat.icon}</span>
+                                <h3>${cat.title}</h3>
+                            </div>
+                            <div class="cat-winner-showcase">
+                                ${topCars.length > 0 ? topCars.map(car => `
+                                    <div class="winner-info-sub" style="margin-bottom: 10px;">
+                                        <img src="${car.img}" alt="${car.name}" class="winner-thumb" onerror="this.src='images/donafest.jpg'">
+                                        <div class="winner-text-col">
+                                            <div class="winner-crown">${topCars.length > 1 ? '🥇 ĐỒNG HẠNG NHẤT' : '🏆 QUÁN QUÂN'}</div>
+                                            <h4 class="winner-name">${car.name}</h4>
+                                            <p class="winner-car">${car.model} (${car.plate})</p>
+                                            <p class="winner-votes">👍 ${car.votes[cat.id]} Votes</p>
+                                        </div>
+                                    </div>
+                                `).join('') : `<p style="color:var(--text-muted); padding:10px;">Chưa có bình chọn cho hạng mục này.</p>`}
+                            </div>
                         </div>
                     `;
                 }
             });
 
+            // 3. Lucky Race Results
             if (leaderboardToggles.race_prizes && raceWinnersHistory.length > 0) {
                 html += `
-                    <div class="glass-card" style="grid-column: 1 / -1;">
-                        <h3>🏎️ KẾT QUẢ DNT LUCKY RACE</h3>
-                        <ul>
-                            ${raceWinnersHistory.map(w => `<li>🏆 <strong>${w.name}</strong> (${w.model}) — ${w.prize}</li>`).join('')}
-                        </ul>
+                    <div class="glass-card" style="grid-column: 1 / -1; margin-top: 15px;">
+                        <h2 style="color: var(--teal); margin-bottom: 15px;">🏎️ BẢNG VÀNG DNT LUCKY RACE</h2>
+                        ${render5PanelsRaceShowcase(raceWinnersHistory)}
                     </div>
                 `;
             }
@@ -1337,6 +1357,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isAdminUnlocked === 'true') {
             adminLoginBox?.classList.add('hidden');
             adminPanel?.classList.remove('hidden');
+            renderAdminAwardsList();
             renderLeaderboardToggles();
             renderRacePrizesOrderList();
             renderCategoriesOrderList();
@@ -1351,6 +1372,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sessionStorage.setItem('dnt_admin_unlocked', 'true');
             adminLoginBox?.classList.add('hidden');
             adminPanel?.classList.remove('hidden');
+            renderAdminAwardsList();
             renderLeaderboardToggles();
             renderRacePrizesOrderList();
             renderCategoriesOrderList();
@@ -1440,33 +1462,104 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // SAVE SHOUTOUT BUTTON HANDLER
-    const saveShoutoutBtn = document.getElementById('saveShoutoutBtn');
-    if (saveShoutoutBtn) {
-        if (document.getElementById('adminWinnerGarage')) document.getElementById('adminWinnerGarage').value = shoutoutData.garage || '';
-        if (document.getElementById('adminWinnerLegend')) document.getElementById('adminWinnerLegend').value = shoutoutData.legend || '';
-        if (document.getElementById('adminWinnerPassionate')) document.getElementById('adminWinnerPassionate').value = shoutoutData.passionate || '';
-        if (document.getElementById('adminPark1')) document.getElementById('adminPark1').value = shoutoutData.parking1 || '';
-        if (document.getElementById('adminPark2')) document.getElementById('adminPark2').value = shoutoutData.parking2 || '';
-        if (document.getElementById('adminPark3')) document.getElementById('adminPark3').value = shoutoutData.parking3 || '';
+    // DYNAMIC AWARDS CONFIG LIST RENDERER & EVENT HANDLERS
+    function renderAdminAwardsList() {
+        const container = document.getElementById('adminAwardsList');
+        if (!container) return;
 
-        saveShoutoutBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            e.stopPropagation();
+        if (awardsConfig.length === 0) {
+            container.innerHTML = `<p style="color:var(--text-secondary); text-align:center; padding:15px;">Chưa có giải vinh danh nào. Bấm nút bên dưới để thêm!</p>`;
+            return;
+        }
 
-            shoutoutData.garage = document.getElementById('adminWinnerGarage').value.trim();
-            shoutoutData.legend = document.getElementById('adminWinnerLegend').value.trim();
-            shoutoutData.passionate = document.getElementById('adminWinnerPassionate').value.trim();
-            shoutoutData.parking1 = document.getElementById('adminPark1').value.trim();
-            shoutoutData.parking2 = document.getElementById('adminPark2').value.trim();
-            shoutoutData.parking3 = document.getElementById('adminPark3').value.trim();
+        container.innerHTML = awardsConfig.map((item, idx) => {
+            const selectedCar = carsData.find(c => c.id === item.carId);
+            const imgPath = selectedCar ? selectedCar.img : 'images/donafest.jpg';
 
-            setStoredData('dnt_shoutouts_2026', shoutoutData);
-            await pushCloudData();
-            renderPublicLeaderboard();
-            alert('💾 Đã cập nhật và đồng bộ Cloud thông tin Vinh Danh thành công!');
+            return `
+                <div class="award-config-row" data-award-id="${item.id}" style="padding:12px; margin-bottom:10px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:10px;">
+                    <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+                        <span style="font-weight:700; color:var(--teal); font-size:0.9rem; min-width:24px;">#${idx + 1}</span>
+                        <input type="text" class="award-title-input" value="${item.title}" placeholder="Tên giải vinh danh..." style="flex:1; padding:8px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.4); color:#fff; font-weight:600;">
+                        <button type="button" class="btn btn-sm btn-danger remove-award-btn" data-award-id="${item.id}" style="padding:6px 10px;">🗑️</button>
+                    </div>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <select class="award-car-select" data-award-id="${item.id}" style="flex:1; padding:8px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(12,11,26,0.9); color:#fff; font-size:0.88rem;">
+                            <option value="">-- Chọn ứng viên đoạt giải --</option>
+                            ${carsData.map(c => `
+                                <option value="${c.id}" ${c.id === item.carId ? 'selected' : ''}>
+                                    ${c.plate} • ${c.name} (${c.model})
+                                </option>
+                            `).join('')}
+                        </select>
+                        <div class="award-img-preview" style="width:48px; height:48px; border-radius:8px; overflow:hidden; border:1px solid var(--teal); flex-shrink:0; background:#000;">
+                            <img src="${imgPath}" alt="Preview" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='images/donafest.jpg'">
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        container.querySelectorAll('.award-title-input').forEach(input => {
+            input.addEventListener('change', (e) => {
+                const row = e.target.closest('.award-config-row');
+                const awardId = row.getAttribute('data-award-id');
+                const item = awardsConfig.find(a => a.id === awardId);
+                if (item) item.title = e.target.value.trim();
+            });
+        });
+
+        container.querySelectorAll('.award-car-select').forEach(select => {
+            select.addEventListener('change', (e) => {
+                const awardId = select.getAttribute('data-award-id');
+                const item = awardsConfig.find(a => a.id === awardId);
+                if (item) {
+                    item.carId = e.target.value;
+                    renderAdminAwardsList();
+                }
+            });
+        });
+
+        container.querySelectorAll('.remove-award-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const awardId = btn.getAttribute('data-award-id');
+                awardsConfig = awardsConfig.filter(a => a.id !== awardId);
+                renderAdminAwardsList();
+            });
         });
     }
+
+    document.getElementById('adminAddAwardBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        awardsConfig.push({
+            id: 'award-' + Date.now(),
+            title: `Giải Vinh Danh #${awardsConfig.length + 1}`,
+            carId: ''
+        });
+        renderAdminAwardsList();
+    });
+
+    document.getElementById('saveAwardsBtn')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const container = document.getElementById('adminAwardsList');
+        if (container) {
+            container.querySelectorAll('.award-config-row').forEach(row => {
+                const awardId = row.getAttribute('data-award-id');
+                const titleInput = row.querySelector('.award-title-input');
+                const select = row.querySelector('.award-car-select');
+                const item = awardsConfig.find(a => a.id === awardId);
+                if (item) {
+                    if (titleInput) item.title = titleInput.value.trim();
+                    if (select) item.carId = select.value;
+                }
+            });
+        }
+        setStoredData('dnt_awards_config_2026', awardsConfig);
+        await pushCloudData();
+        renderPublicLeaderboard();
+        alert('💾 Đã cập nhật và đồng bộ Cloud danh sách Vinh Danh thành công!');
+    });
 
     // Render Admin Leaderboard ON/OFF Toggles
     function renderLeaderboardToggles() {
@@ -1474,10 +1567,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!listEl) return;
 
         const toggleItems = [
-            { id: 'garage', label: '🏬 Garage Làm Cho Vui Nhất' },
-            { id: 'legend', label: '👑 DNT Legend' },
-            { id: 'passionate', label: '🔥 DNT Passionate' },
-            { id: 'parking', label: '🅿️ Kết Quả Cuộc Thi Đỗ Xe' },
+            { id: 'vinhdanh', label: '👑 Bảng Vàng Vinh Danh (Dynamic Awards)' },
             { id: 'race_prizes', label: '🏎️ Kết Quả DNT Lucky Race' },
             ...categoriesList.map(c => ({ id: c.id, label: `${c.icon} ${c.title}` }))
         ];

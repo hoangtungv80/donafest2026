@@ -297,38 +297,19 @@
                         </form>
                     </div>
 
-                    <!-- Panel 6: Shoutout & Parking Winners Config -->
+                    <!-- Panel 6: Dynamic Awards Config -->
                     <div class="glass-card">
-                        <h3>👑 QUẢN LÝ VINH DANH SHOUTOUT & ĐỖ XE</h3>
-                        <form id="adminShoutoutForm" class="admin-form" onsubmit="return false;">
-                            <div class="form-group">
-                                <label for="adminWinnerGarage">Garage làm cho vui nhất:</label>
-                                <input type="text" id="adminWinnerGarage" placeholder="Tên Garage / Thành viên">
-                            </div>
-                            <div class="form-group">
-                                <label for="adminWinnerLegend">DNT Legend (Xe kì cựu):</label>
-                                <input type="text" id="adminWinnerLegend" placeholder="Tên xe & chủ xe">
-                            </div>
-                            <div class="form-group">
-                                <label for="adminWinnerPassionate">DNT Passionate (Tâm huyết):</label>
-                                <input type="text" id="adminWinnerPassionate" placeholder="Tên thành viên">
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="adminPark1">Giải Nhất Đỗ Xe:</label>
-                                    <input type="text" id="adminPark1" placeholder="Tên / Mã số">
-                                </div>
-                                <div class="form-group">
-                                    <label for="adminPark2">Giải Nhì Đỗ Xe:</label>
-                                    <input type="text" id="adminPark2" placeholder="Tên / Mã số">
-                                </div>
-                                <div class="form-group">
-                                    <label for="adminPark3">Giải Ba Đỗ Xe:</label>
-                                    <input type="text" id="adminPark3" placeholder="Tên / Mã số">
-                                </div>
-                            </div>
-                            <button type="button" id="saveShoutoutBtn" class="btn btn-primary btn-block">💾 Cập Nhật Vinh Danh</button>
-                        </form>
+                        <h3>👑 QUẢN LÝ VINH DANH</h3>
+                        <p class="card-sub-hint">Thêm/bớt giải và chọn ứng viên đoạt giải:</p>
+                        <div id="adminAwardsList" class="awards-config-list margin-top-10">
+                            <!-- Dynamic Award Items rendered by JS -->
+                        </div>
+                        <button type="button" id="adminAddAwardBtn" class="btn btn-outline btn-block margin-top-10">
+                            ➕ Thêm Giải Vinh Danh Mới
+                        </button>
+                        <button type="button" id="saveAwardsBtn" class="btn btn-primary btn-block margin-top-10">
+                            💾 Cập Nhật & Đồng Bộ Vinh Danh
+                        </button>
                     </div>
 
                 </div>
