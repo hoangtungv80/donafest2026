@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DONAFEST 2026 | Cổng Bình Chọn, Leaderboard & DNT Lucky Race</title>
+    <meta name="description" content="Hệ thống Minigame sự kiện DONAFEST 2026: Cổng bình chọn, Leaderboard vinh danh, DNT Lucky Race 25 làn.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="minigame.css">
+</head>
+<body class="minigame-body">
+
+    <!-- Overall Portal Lock Modal -->
+    <div id="portalLockOverlay" class="portal-lock-overlay">
+        <div class="glass-card portal-lock-card">
+            <div class="lock-glow-icon">🏎️</div>
+            <h2 class="lock-title">DONAFEST 2026 ARENA</h2>
+            <p class="lock-sub">Nhập mã truy cập để vào Cổng Bình Chọn & DNT Lucky Race</p>
+            <div class="lock-input-group">
+                <input type="password" id="portalPassInput" placeholder="Mã truy cập..." autocomplete="off">
+                <button type="button" id="portalPassBtn" class="btn btn-primary btn-glow">TRUY CẬP</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="loader-content">
+            <div class="loader-logo">DONAFEST 2026</div>
+            <div class="loader-sub">MINIGAME & DNT LUCKY RACE</div>
+            <div class="loader-bar"><div class="loader-progress"></div></div>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav id="navbar" class="scrolled">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <span class="logo-dona">DONA</span><span class="logo-team">GAME</span>
+                <span class="logo-vn">2026</span>
+            </a>
+
+            <div class="nav-links" id="navLinks">
+                <a href="index.html" class="nav-link">Trang chủ</a>
+                <a href="#voting" class="nav-link active" data-tab="voting">Cổng Bình Chọn</a>
+                <a href="#leaderboard" class="nav-link" data-tab="leaderboard">Leaderboard</a>
+                <a href="#race" class="nav-link highlight-nav" data-tab="race">DNT Lucky Race</a>
+                <a href="#admin" class="nav-link nav-admin-link" data-tab="admin">
+                    <span class="lock-icon">🔒</span> BQT Portal
+                </a>
+            </div>
+
+            <div class="nav-actions">
+                <button type="button" id="soundToggleBtn" class="icon-btn" title="Bật/Tắt Âm thanh">
+                    <span id="soundIcon">🔊</span>
+                </button>
+                <button type="button" class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Banner -->
+    <header class="game-header">
+        <div class="header-overlay"></div>
+        <div class="header-content">
+            <div class="gta-badge">
+                <span>🎮 DONATEAM EVENT ARENA</span>
+            </div>
+            <h1 class="game-title">
+                <span class="pink-text">DONAFEST</span> <span class="cyan-text">ARENA</span> <span class="gold-text">2026</span>
+            </h1>
+            <p class="game-subtitle">Cổng Bình Chọn • Leaderboard Trao Giải • DNT Lucky Race 25 Làn</p>
+
+            <!-- Quick Navigation Tabs -->
+            <div class="tab-buttons-container">
+                <button type="button" class="tab-btn active" data-tab-target="voting">
+                    <span class="tab-icon">🏆</span> Cổng Bình Chọn
+                </button>
+                <button type="button" class="tab-btn" data-tab-target="leaderboard">
+                    <span class="tab-icon">👑</span> Leaderboard
+                </button>
+                <button type="button" class="tab-btn highlight-tab" data-tab-target="race">
+                    <span class="tab-icon">🏎️</span> DNT Lucky Race
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-content">
+
+        <!-- ================= TAB 1: CỔNG BÌNH CHỌN ================= -->
+        <section id="voting" class="game-tab-section active">
+            <div class="section-header">
+                <h2 class="section-title"><span class="icon">🏆</span> CỔNG BÌNH CHỌN DONAFEST 2026</h2>
+                <p class="section-desc">Mỗi thiết bị được bình chọn <strong>1 phiếu duy nhất</strong> cho mỗi hạng mục. Chọn danh mục để xem thí sinh & vote!</p>
+            </div>
+
+            <!-- Device Vote Status Bar -->
+            <div class="vote-status-bar" id="voteStatusBar">
+                <span class="status-icon">🛡️</span>
+                <span id="voteStatusText">Mã thiết bị của bạn đã sẵn sàng bình chọn.</span>
+            </div>
+
+            <!-- Mobile Back Button -->
+            <button type="button" id="mobileBackToCatsBtn" class="btn btn-outline mobile-back-btn hidden">
+                ← QUAY LẠI 12 HẠNG MỤC
+            </button>
+
+            <!-- Voting Main Layout -->
+            <div class="voting-layout-grid">
+
+                <!-- Left Panel: 12 Categories -->
+                <aside class="voting-sidebar glass-card" id="votingSidebarPanel">
+                    <div class="sidebar-header">
+                        <h3 class="sidebar-cat-title">CỔNG BÌNH CHỌN</h3>
+                        <span class="badge-cat-count">12 Mục</span>
+                    </div>
+                    <div class="voting-categories-vertical" id="votingCategoriesNav">
+                        <!-- Rendered by JS -->
+                    </div>
+                </aside>
+
+                <!-- Right Panel: Candidate Cards -->
+                <div class="voting-main-content" id="votingMainContentPanel">
+                    <!-- Active Category Banner -->
+                    <div class="active-cat-banner glass-card" id="activeCategoryBanner">
+                        <div class="cat-banner-icon" id="catBannerIcon">🏎️</div>
+                        <div class="cat-banner-info">
+                            <h3 class="cat-banner-title" id="catBannerTitle">Car of Choice</h3>
+                            <p class="cat-banner-desc" id="catBannerDesc">Xe được yêu thích nhất toàn đoàn DONAFEST 2026</p>
+                        </div>
+                        <div class="cat-banner-stat">
+                            <span class="stat-label">Tổng Lượt Vote</span>
+                            <span class="stat-val" id="catTotalVotes">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Candidate Cards Container -->
+                    <div class="candidate-grid" id="candidateGrid">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ================= TAB 2: LEADERBOARD ================= -->
+        <section id="leaderboard" class="game-tab-section">
+            <div class="section-header">
+                <h2 class="section-title"><span class="icon">👑</span> LEADERBOARD BẢNG VÀNG SỰ KIỆN</h2>
+                <p class="section-desc">Bảng vinh danh kết quả các giải thưởng chính thức của DONAFEST 2026.</p>
+            </div>
+
+            <div id="leaderboardWaitingBox" class="glass-card waiting-box-card">
+                <div class="waiting-icon">⏳</div>
+                <h2 class="waiting-title">ANH EM VUI LÒNG KHÔNG SỐT RUỘT</h2>
+                <p class="waiting-sub">THỜI GIAN TRAO GIẢI SẮP TỚI RỒI!</p>
+                <div class="waiting-dots">
+                    <span class="dot">●</span><span class="dot">●</span><span class="dot">●</span>
+                </div>
+            </div>
+
+            <div id="leaderboardRevealedContent" class="revealed-content-grid hidden">
+                <!-- Dynamically rendered by JS -->
+            </div>
+        </section>
+
+
+        <!-- ================= TAB 3: DNT LUCKY RACE LEADERBOARD SHOWCASE ================= -->
+        <section id="race" class="game-tab-section">
+            <div class="section-header">
+                <h2 class="section-title"><span class="icon">🏁</span> BẢNG VÀNG KẾT QUẢ DNT LUCKY RACE</h2>
+                <p class="section-desc">Danh sách các xế chiến xuất sắc giành chiến thắng trong cuộc đua DNT Lucky Race tại DONAFEST 2026!</p>
+            </div>
+
+            <!-- Public Race Leaderboard Container -->
+            <div id="publicRaceLeaderboard" class="public-race-container">
+                <!-- Rendered by JS -->
+            </div>
+        </section>
+
+
+        <!-- ================= TAB 4: CỔNG QUẢN TRỊ BQT ================= -->
+        <section id="admin" class="game-tab-section">
+            <div class="section-header">
+                <h2 class="section-title"><span class="icon">🔐</span> CỔNG QUẢN TRỊ BAN TỔ CHỨC (BQT)</h2>
+                <p class="section-desc">Bảng điều khiển công bố Leaderboard, cấu hình giải thưởng & mở trình chiếu sân khấu LED.</p>
+            </div>
+
+            <div id="adminLoginBox" class="glass-card admin-login-card">
+                <div class="admin-lock-icon">🔑</div>
+                <h3>ĐĂNG NHẬP BAN QUẢN TRỊ</h3>
+                <p>Nhập mã PIN BQT để mở khóa bảng điều khiển</p>
+
+                <div class="pin-input-group">
+                    <input type="password" id="adminPinInput" placeholder="Mã PIN..." maxlength="20">
+                    <button type="button" id="adminLoginBtn" class="btn btn-primary">Xác Nhận</button>
+                </div>
+            </div>
+
+            <div id="adminPanel" class="admin-panel-container hidden">
+
+                <div class="admin-top-bar glass-card">
+                    <div class="admin-welcome">
+                        <span class="badge-active">● BQT AUTHENTICATED</span>
+                        <span>Xin chào Ban Quản Trị DONAFEST 2026!</span>
+                    </div>
+                    <div class="admin-top-btns">
+                        <button type="button" id="adminLaunchPresentationBtn" class="btn btn-primary btn-lg btn-glow">
+                            🎬 MỞ TRÌNH CHIẾU SÂN KHẤU (FULLSCREEN)
+                        </button>
+                        <button type="button" id="adminLogoutBtn" class="btn btn-secondary btn-sm">Đăng xuất</button>
+                    </div>
+                </div>
+
+                <!-- ROW 1: 3 SEPARATE REORDER PANELS -->
+                <div class="grid-3col admin-grid margin-top-20">
+
+                    <!-- Panel 1: Race Prizes Reorder -->
+                    <div class="glass-card">
+                        <h3>🏎️ THỨ TỰ TRAO GIẢI DNT LUCKY RACE</h3>
+                        <p class="card-sub-hint">Thứ tự quay các giải đua:</p>
+                        <div class="reorder-presentation-list" id="racePrizesOrderList">
+                            <!-- JS Generated -->
+                        </div>
+                    </div>
+
+                    <!-- Panel 2: 12 Voting Categories Reorder -->
+                    <div class="glass-card">
+                        <h3>🗂️ THỨ TỰ 12 HẠNG MỤC BÌNH CHỌN</h3>
+                        <p class="card-sub-hint">Thứ tự hiển thị & trình chiếu 12 giải vote:</p>
+                        <div class="reorder-presentation-list" id="categoriesOrderList">
+                            <!-- JS Generated -->
+                        </div>
+                    </div>
+
+                    <!-- Panel 3: Stage Presentation Sections Reorder -->
+                    <div class="glass-card">
+                        <h3>📽️ THỨ TỰ CÁC PHẦN TRÌNH CHIẾU</h3>
+                        <p class="card-sub-hint">Thứ tự các phần trình chiếu LED:</p>
+                        <div class="reorder-presentation-list" id="presentationOrderList">
+                            <!-- JS Generated -->
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ROW 2: TOGGLES + QUOTAS + SHOUTOUTS -->
+                <div class="grid-3col admin-grid margin-top-20">
+
+                    <!-- Panel 4: Leaderboard Public Toggles -->
+                    <div class="glass-card">
+                        <h3>👁️ MỞ LEADERBOARD PUBLIC</h3>
+                        <p class="card-sub-hint">Bật ON giải để xuất hiện công khai:</p>
+                        <div class="leaderboard-toggles-list" id="leaderboardTogglesList">
+                            <!-- JS Generated -->
+                        </div>
+                    </div>
+
+                    <!-- Panel 5: Prize Quotas Config -->
+                    <div class="glass-card">
+                        <h3>🎁 SỐ LƯỢNG GIẢI DNT LUCKY RACE</h3>
+                        <form id="adminPrizeQuotaForm" class="admin-form" onsubmit="return false;">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="quotaSpecial">🏆 Giải Đặc Biệt (Số xe):</label>
+                                    <input type="number" id="quotaSpecial" min="1" max="10" value="1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="quotaFirst">🥇 Giải Nhất (Số xe):</label>
+                                    <input type="number" id="quotaFirst" min="1" max="10" value="1">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="quotaSecond">🥈 Giải Nhì (Số xe):</label>
+                                    <input type="number" id="quotaSecond" min="1" max="10" value="2">
+                                </div>
+                                <div class="form-group">
+                                    <label for="quotaThird">🥉 Giải Ba (Số xe):</label>
+                                    <input type="number" id="quotaThird" min="1" max="10" value="3">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="quotaConsolation">🎁 Giải Khuyến Khích (Số xe):</label>
+                                <input type="number" id="quotaConsolation" min="1" max="25" value="5">
+                            </div>
+
+                            <button type="button" id="savePrizeQuotaBtn" class="btn btn-primary btn-block">💾 Lưu Cấu Hình Số Lượng Giải</button>
+                        </form>
+                    </div>
+
+                    <!-- Panel 6: Shoutout & Parking Winners Config -->
+                    <div class="glass-card">
+                        <h3>👑 QUẢN LÝ VINH DANH SHOUTOUT & ĐỖ XE</h3>
+                        <form id="adminShoutoutForm" class="admin-form" onsubmit="return false;">
+                            <div class="form-group">
+                                <label for="adminWinnerGarage">Garage làm cho vui nhất:</label>
+                                <input type="text" id="adminWinnerGarage" placeholder="Tên Garage / Thành viên">
+                            </div>
+                            <div class="form-group">
+                                <label for="adminWinnerLegend">DNT Legend (Xe kì cựu):</label>
+                                <input type="text" id="adminWinnerLegend" placeholder="Tên xe & chủ xe">
+                            </div>
+                            <div class="form-group">
+                                <label for="adminWinnerPassionate">DNT Passionate (Tâm huyết):</label>
+                                <input type="text" id="adminWinnerPassionate" placeholder="Tên thành viên">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="adminPark1">Giải Nhất Đỗ Xe:</label>
+                                    <input type="text" id="adminPark1" placeholder="Tên / Mã số">
+                                </div>
+                                <div class="form-group">
+                                    <label for="adminPark2">Giải Nhì Đỗ Xe:</label>
+                                    <input type="text" id="adminPark2" placeholder="Tên / Mã số">
+                                </div>
+                                <div class="form-group">
+                                    <label for="adminPark3">Giải Ba Đỗ Xe:</label>
+                                    <input type="text" id="adminPark3" placeholder="Tên / Mã số">
+                                </div>
+                            </div>
+                            <button type="button" id="saveShoutoutBtn" class="btn btn-primary btn-block">💾 Cập Nhật Vinh Danh</button>
+                        </form>
+                    </div>
+
+                </div>
+
+                <!-- ROW 3: EXPORT & DATA BACKUP TOOLS -->
+                <div class="glass-card margin-top-20">
+                    <h3>📥 XUẤT BÁO CÁO & SAO LƯU DỮ LIỆU</h3>
+                    <div class="admin-actions-bar margin-bottom-10">
+                        <button type="button" id="adminResetDefaultCarsBtn" class="btn btn-sm btn-outline">🔄 Reset 25 Thí Sinh Gốc</button>
+                        <button type="button" id="adminResetVotesBtn" class="btn btn-sm btn-danger">⚠️ Reset Lượt Vote</button>
+                        <button type="button" id="adminResetRaceBtn" class="btn btn-sm btn-danger">⚠️ Reset Kết Quả DNT Lucky Race</button>
+                    </div>
+                    <div class="export-buttons-group">
+                        <button type="button" id="adminExportJsonBtn" class="btn btn-outline">📥 Xuất File Dữ Liệu Backup (JSON)</button>
+                        <button type="button" id="adminExportCsvBtn" class="btn btn-outline">📊 Xuất Báo Cáo Giải Thưởng (CSV)</button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Presentation Fullscreen Stage Slideshow Overlay (2-Level Navigation + Dynamic Background) -->
+    <div id="presentationOverlay" class="presentation-stage-overlay hidden">
+        <button type="button" class="stage-close-btn" id="stageCloseBtn">&times; ĐÓNG TRÌNH CHIẾU</button>
+        <button type="button" class="stage-close-btn-bottom-left" id="stageCloseBtnBottomLeft">✖ THOÁT TRÌNH CHIẾU</button>
+        
+        <!-- Multi-Level Stage Controls Navigation -->
+        <div class="stage-controls-nav-bar">
+            <!-- Level 1 Section Jump Controls -->
+            <div class="sec-nav-group">
+                <button type="button" id="stagePrevSecBtn" class="stage-nav-btn btn-sec-nav">⏮️ PHẦN TRƯỚC</button>
+                <span id="stageSectionIndicator" class="sec-indicator">Phần 1 / 4: CỔNG BÌNH CHỌN</span>
+                <button type="button" id="stageNextSecBtn" class="stage-nav-btn btn-sec-nav btn-glow">PHẦN TIẾP THEO ⏩</button>
+            </div>
+
+            <!-- Level 2 Slide Jump Controls -->
+            <div class="slide-nav-group">
+                <button type="button" id="stagePrevSlideBtn" class="stage-nav-btn btn-slide-nav">◀ SLIDE TRƯỚC</button>
+                <span id="stageSlideIndicator" class="slide-indicator">Slide 1 / 12</span>
+                <button type="button" id="stageNextSlideBtn" class="stage-nav-btn btn-slide-nav btn-glow">SLIDE TIẾP ▶</button>
+            </div>
+        </div>
+
+        <!-- Dynamic Stage Hero Slide Container (with Winner Photo Background Overlay) -->
+        <div class="stage-slide-container" id="stageSlideContent">
+            <!-- Dynamic Slide Content rendered by JS -->
+        </div>
+
+        <!-- Multi-Winner Announcement Modal (Placed INSIDE Presentation Stacking Context to prevent any layer hiding) -->
+        <div id="winnerModal" class="modal-overlay hidden">
+            <div class="modal-card glass-card modal-wide">
+                <button type="button" class="modal-close" id="modalCloseBtn">&times;</button>
+                <div class="winner-trophy">🏆</div>
+                <div class="winner-banner" id="modalWinnerBanner">KẾT QUẢ DNT LUCKY RACE!</div>
+                <h2 class="winner-prize" id="modalWinnerPrize">GIẢI NHẤT</h2>
+
+                <div class="winners-podium-list" id="modalWinnersList">
+                    <!-- JS inserted -->
+                </div>
+
+                <div class="modal-action-btns flex-center gap-12 margin-top-20">
+                    <button type="button" class="btn btn-primary btn-lg btn-glow" id="modalNextPrizeBtn">⏩ GIẢI TIẾP THEO</button>
+                    <button type="button" class="btn btn-secondary btn-lg" id="modalOkBtn">XÁC NHẬN TRAO GIẢI</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="game-footer">
+        <div class="footer-container">
+            <p>© 2026 DONAFEST MINIGAME ARENA. Designed for DONATEAM VIETNAM 5-Year Heritage Journey.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+    <script src="minigame.js"></script>
+</body>
+</html>
