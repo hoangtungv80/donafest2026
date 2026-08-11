@@ -179,48 +179,36 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('dnt_device_id', deviceId);
     }
     let votedCategories = getStoredData('dnt_voted_cats_' + deviceId, {});
-    // -1 means this device has never synced a resetVer from Cloud yet.
     // -1 = device has never synced resetVer from Cloud. On first sync,
     // store current cloud resetVer WITHOUT wiping votedCategories.
     const NEVER_SYNCED_RESET_VER = -1;
     let voteResetVersion = getStoredData('dnt_vote_reset_ver', NEVER_SYNCED_RESET_VER);
 
-    // ====== GITHUB GIST CLOUD SYNC ENGINE ======
-    // Two separate Gists for stability:
-    //   VOTES_GIST  — only votes + resetVer (tiny, updated on every vote)
-    //   CONFIG_GIST — BQT config: toggles, shoutouts, winners, completed
-    const GITHUB_TOKEN = ['ghp_31npSQcwY13rH', 'BOMUODwv9LAxRPL0Z3XvU8R'].join('');
-    const VOTES_GIST_ID = 'a9a076a38a6b744f81b7c8564913337b';
-    const GIST_API = 'https://api.github.com/gists/';
+    // ====== FIREBASE REALTIME DATABASE ENGINE ======
+    // Uses REST API directly — no SDK, no token, config is safe to be public
+    const FB_URL = 'https://donafest2026-default-rtdb.asia-southeast1.firebasedatabase.app';
 
     let isCloudSyncing = false;
 
-    async function fetchGist(gistId) {
-        const res = await fetch(`${GIST_API}${gistId}`, {
-            headers: {
-                'Authorization': `Bearer ${GITHUB_TOKEN}`,
-                'Accept': 'application/vnd.github+json',
-                'X-GitHub-Api-Version': '2022-11-28',
-                'Cache-Control': 'no-cache'
-            }
-        });
+    async function fbGet(path) {
+        const res = await fetch(`${FB_URL}/${path}.json`, { cache: 'no-store' });
         if (!res.ok) return null;
-        const gist = await res.json();
-        const file = gist.files['votes.json'];
-        if (!file || !file.content) return null;
-        return JSON.parse(file.content);
+        return res.json();
     }
 
-    async function patchGist(gistId, filename, data) {
-        await fetch(`${GIST_API}${gistId}`, {
+    async function fbSet(path, data) {
+        await fetch(`${FB_URL}/${path}.json`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+    }
+
+    async function fbPatch(path, data) {
+        await fetch(`${FB_URL}/${path}.json`, {
             method: 'PATCH',
-            headers: {
-                'Authorization': `Bearer ${GITHUB_TOKEN}`,
-                'Accept': 'application/vnd.github+json',
-                'X-GitHub-Api-Version': '2022-11-28',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ files: { [filename]: { content: JSON.stringify(data) } } })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
         });
     }
 
@@ -228,85 +216,81 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isCloudSyncing) return;
         isCloudSyncing = true;
         try {
-            const cloudData = await fetchGist(VOTES_GIST_ID);
-            if (cloudData) {
-                // 1. Reset version check
-                const cloudResetVer = cloudData.resetVer || 1;
-                if (voteResetVersion === NEVER_SYNCED_RESET_VER) {
-                    // First sync — learn current version, do NOT wipe voted categories
-                    voteResetVersion = cloudResetVer;
-                    setStoredData('dnt_vote_reset_ver', voteResetVersion);
-                } else if (cloudResetVer > voteResetVersion) {
-                    // BQT genuinely triggered a reset
-                    voteResetVersion = cloudResetVer;
-                    setStoredData('dnt_vote_reset_ver', voteResetVersion);
-                    votedCategories = {};
-                    setStoredData('dnt_voted_cats_' + deviceId, {});
-                }
+            const cloudData = await fbGet('');
+            if (!cloudData) { isCloudSyncing = false; return; }
 
-                // 2. Sync Votes (Cloud is Ground Truth)
-                if (cloudData.votes) {
-                    carsData.forEach(car => {
-                        car.votes = cloudData.votes[car.id] ? { ...cloudData.votes[car.id] } : {};
-                    });
-                    setStoredData('dnt_cars_official_v3', carsData);
-                }
-
-                // 3. Sync BQT Config (toggles, shoutouts, winners, completed) if present
-                if (cloudData.toggles) {
-                    leaderboardToggles = cloudData.toggles;
-                    setStoredData('dnt_leaderboard_toggles', leaderboardToggles);
-                }
-                if (cloudData.shoutouts) {
-                    shoutoutData = cloudData.shoutouts;
-                    setStoredData('dnt_shoutouts_2026', shoutoutData);
-                }
-                if (cloudData.winners !== undefined) {
-                    raceWinnersHistory = cloudData.winners;
-                    setStoredData('dnt_race_winners_2026', raceWinnersHistory);
-                }
-                if (cloudData.completed !== undefined) {
-                    completedPrizes = cloudData.completed;
-                    setStoredData('dnt_completed_prizes_2026', completedPrizes);
-                }
-
-                renderVotingSection();
-                renderPublicLeaderboard();
-                renderPublicRaceLeaderboard();
+            // 1. Reset version check
+            const cloudResetVer = cloudData.resetVer || 1;
+            if (voteResetVersion === NEVER_SYNCED_RESET_VER) {
+                voteResetVersion = cloudResetVer;
+                setStoredData('dnt_vote_reset_ver', voteResetVersion);
+            } else if (cloudResetVer > voteResetVersion) {
+                voteResetVersion = cloudResetVer;
+                setStoredData('dnt_vote_reset_ver', voteResetVersion);
+                votedCategories = {};
+                setStoredData('dnt_voted_cats_' + deviceId, {});
             }
+
+            // 2. Sync votes — Firebase is ground truth
+            const cloudVotes = cloudData.votes || {};
+            carsData.forEach(car => {
+                car.votes = cloudVotes[car.id] ? { ...cloudVotes[car.id] } : {};
+            });
+            setStoredData('dnt_cars_official_v3', carsData);
+
+            // 3. Sync BQT config
+            if (cloudData.toggles) {
+                leaderboardToggles = cloudData.toggles;
+                setStoredData('dnt_leaderboard_toggles', leaderboardToggles);
+            }
+            if (cloudData.shoutouts) {
+                shoutoutData = cloudData.shoutouts;
+                setStoredData('dnt_shoutouts_2026', shoutoutData);
+            }
+            if (cloudData.winners !== undefined) {
+                raceWinnersHistory = Array.isArray(cloudData.winners) ? cloudData.winners : [];
+                setStoredData('dnt_race_winners_2026', raceWinnersHistory);
+            }
+            if (cloudData.completed !== undefined) {
+                completedPrizes = cloudData.completed || {};
+                setStoredData('dnt_completed_prizes_2026', completedPrizes);
+            }
+
+            renderVotingSection();
+            renderPublicLeaderboard();
+            renderPublicRaceLeaderboard();
         } catch(e) {
-            console.log('Gist sync error:', e.message);
+            console.log('Firebase sync error:', e.message);
         } finally {
             isCloudSyncing = false;
         }
     }
 
+    // Push only ONE vote count to Firebase (tiny atomic write)
+    async function pushOneVote(carId, catId, newCount) {
+        try {
+            await fbSet(`votes/${carId}/${catId}`, newCount);
+        } catch(e) {
+            console.log('Firebase vote push error:', e.message);
+        }
+    }
+
+    // Push BQT config (toggles, shoutouts, race results, etc.)
     async function pushCloudData() {
         try {
-            const votesMap = {};
-            carsData.forEach(c => {
-                if (c.votes && Object.keys(c.votes).length > 0) {
-                    votesMap[c.id] = c.votes;
-                }
-            });
-
-            const payload = {
-                votes: votesMap,
+            await fbPatch('', {
                 resetVer: voteResetVersion,
                 toggles: leaderboardToggles,
                 shoutouts: shoutoutData,
                 winners: raceWinnersHistory,
-                completed: completedPrizes,
-                lastUpdated: new Date().toISOString()
-            };
-
-            await patchGist(VOTES_GIST_ID, 'votes.json', payload);
+                completed: completedPrizes
+            });
         } catch(e) {
-            console.log('Gist push error:', e.message);
+            console.log('Firebase config push error:', e.message);
         }
     }
 
-    // Initial sync & 3s polling loop (Gist API rate limit: 5000 req/hr)
+    // Initial sync & 3s polling loop
     syncCloudData();
     setInterval(syncCloudData, 3000);
 
@@ -988,35 +972,24 @@ document.addEventListener('DOMContentLoaded', () => {
         votedCategories[catId] = carId;
         setStoredData('dnt_voted_cats_' + deviceId, votedCategories);
 
-        // Fetch fresh Cloud DB votes with cache buster query parameter + headers
+        // Fetch current vote count for ONLY this car+category from Firebase
+        let currentCount = 0;
         try {
-            const cacheBusterUrl = `${CLOUD_DB_URL}?_t=${Date.now()}`;
-            const res = await fetch(cacheBusterUrl, {
-                method: 'GET',
-                headers: {
-                    'Cache-Control': 'no-cache, no-store, must-revalidate',
-                    'Pragma': 'no-cache'
-                }
-            });
-            if (res.ok) {
-                const cloudData = await res.json();
-                if (cloudData && cloudData.votes) {
-                    carsData.forEach(car => {
-                        car.votes = cloudData.votes[car.id] ? { ...cloudData.votes[car.id] } : {};
-                    });
-                }
-            }
+            const existing = await fbGet(`votes/${carId}/${catId}`);
+            if (typeof existing === 'number') currentCount = existing;
         } catch(e) {}
+
+        const newCount = currentCount + 1;
 
         const car = carsData.find(c => c.id === carId);
         if (car) {
             if (!car.votes) car.votes = {};
-            car.votes[catId] = (car.votes[catId] || 0) + 1;
+            car.votes[catId] = newCount;
             setStoredData('dnt_cars_official_v3', carsData);
         }
 
-        // Push real-time vote count directly to Cloud DB
-        await pushCloudData();
+        // Write ONLY this one vote cell to Firebase (tiny atomic write)
+        await pushOneVote(carId, catId, newCount);
 
         playSound('go');
         alert(`🎉 Cảm ơn bạn! Đã bình chọn thành công cho [${car ? car.model : ''} - ${car ? car.name : ''}]!`);
@@ -1637,18 +1610,19 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('adminResetVotesBtn')?.addEventListener('click', async (e) => {
         e.preventDefault();
         if (confirm('⚠️ Reset toàn bộ lượt bình chọn về 0 trên Cloud và mở lại quyền vote cho TẤT CẢ THIẾT BỊ?')) {
-            // 1. Reset votes on all 25 cars
+            // 1. Reset votes on all 25 cars locally
             carsData.forEach(c => c.votes = {});
             setStoredData('dnt_cars_official_v3', carsData);
 
-            // 2. Increment Cloud Reset Version to automatically unlock all devices!
+            // 2. Increment resetVer to unlock all devices
             voteResetVersion = Date.now();
             setStoredData('dnt_vote_reset_ver', voteResetVersion);
             votedCategories = {};
             setStoredData('dnt_voted_cats_' + deviceId, {});
 
-            // 3. Push Cloud State
-            await pushCloudData();
+            // 3. Push to Firebase: wipe votes node + update resetVer
+            await fbSet('votes', null);  // deletes all vote data
+            await fbPatch('', { resetVer: voteResetVersion });
             renderVotingSection();
             alert('✅ Đã reset thành công tất cả lượt bình chọn & mở lại quyền vote cho TẤT CẢ THIẾT BỊ!');
         }
@@ -1663,7 +1637,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentRacePrizeKey = 'consolation';
             setStoredData('dnt_race_winners_2026', raceWinnersHistory);
             setStoredData('dnt_completed_prizes_2026', completedPrizes);
-            await pushCloudData();
+            await fbPatch('', { winners: null, completed: null });
             renderPublicRaceLeaderboard();
             renderPublicLeaderboard();
             renderRacePrizesOrderList();
