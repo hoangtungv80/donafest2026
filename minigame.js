@@ -1,6 +1,6 @@
 /* =============================================
    DONAFEST 2026 — Minigame & Arena Engine
-   Realtime Cloud Synchronization Engine (Multi-Device Shared Vote Counter)
+   Realtime Cloud Synchronization Engine (Multi-Device Ground Truth & Vote Lock Reset)
    ============================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -69,31 +69,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ====== 3. OFFICIAL 25 PARTICIPANTS ROSTER ======
     const OFFICIAL_25_CARS = [
-        { id: 'car-1', name: 'Hoàng Tùng', model: 'BMW 640i F06 2012 Đen', plate: 'DNT-01', team: 'DONATEAM', color: '#1e1e1e', img: 'images/hero/hero (1).jpg', desc: 'BMW 640i F06 Gran Coupe màu đen độc bản', votes: { car_choice: 42, best_style: 35 } },
-        { id: 'car-2', name: 'Trịnh Quốc Trung', model: 'HONDA - CIVIC FE Trắng', plate: 'DNT-02', team: 'DONATEAM', color: '#f5f6fa', img: 'images/hero/hero (2).jpg', desc: 'Honda Civic FE màu trắng thể thao', votes: { car_choice: 38, street_fighter: 25 } },
-        { id: 'car-3', name: 'Ngô Quang Nghĩa', model: 'BMW 520i Cát Hải Xanh Xám', plate: 'DNT-03', team: 'DONATEAM', color: '#546de5', img: 'images/hero/hero (3).jpg', desc: 'BMW 520i Cát Hải xanh xám sang trọng', votes: { cleanest: 50 } },
-        { id: 'car-4', name: 'Nguyễn Quốc Hưng', model: 'BMW F30 B48 2016 Xanh Sáng', plate: 'DNT-04', team: 'DONATEAM', color: '#00d2d3', img: 'images/hero/hero (4).jpg', desc: 'BMW F30 B48 động cơ 2016 xanh sáng', votes: { best_build: 45 } },
-        { id: 'car-5', name: 'Nguyễn Thu Đức Trung', model: 'Honda Civic RS 2023 Trắng', plate: 'DNT-05', team: 'DONATEAM', color: '#ffffff', img: 'images/donafest.jpg', desc: 'Honda Civic RS 2023 trắng cá tính', votes: { realism_bro: 30 } },
-        { id: 'car-6', name: 'Nguyễn Khánh Duy', model: 'Vinfast VF3 2025', plate: 'DNT-06', team: 'DONATEAM', color: '#ff9f43', img: 'images/donagala.jpg', desc: 'VinFast VF3 điện đô thị 2025', votes: { techguy: 40 } },
-        { id: 'car-7', name: 'Vũ Tùng Dương', model: 'Vinfast VF3 2025', plate: 'DNT-07', team: 'DONATEAM', color: '#ee5253', img: 'images/donatrip.jpg', desc: 'VinFast VF3 2025 siêu chất', votes: { lord_lo: 20 } },
-        { id: 'car-8', name: 'Tran Ngoc Hieu (Lee Tran)', model: 'Vinfast Limo Green 2026 Đen', plate: 'DNT-08', team: 'DONATEAM', color: '#10ac84', img: 'images/venue.jpg', desc: 'VinFast Limo Green 2026 đen VIP', votes: { unique_abs: 55 } },
-        { id: 'car-9', name: 'Nguyễn Văn Tùng', model: 'HONDA CIVIC RS 2020 Đỏ', plate: 'DNT-09', team: 'DONATEAM', color: '#ff0000', img: 'images/hero/hero (1).jpg', desc: 'Honda Civic RS 2020 đỏ rực rỡ', votes: { too_loud: 60 } },
-        { id: 'car-10', name: 'Nguyễn Thanh Tùng', model: 'Civic Gen8 Đen Trắng', plate: 'DNT-10', team: 'DONATEAM', color: '#2f3640', img: 'images/hero/hero (2).jpg', desc: 'Honda Civic Gen8 màu đen trắng', votes: { best_style: 28 } },
-        { id: 'car-11', name: 'Trương Hùng', model: 'Vinfast Lux A Plus 2021 Đen', plate: 'DNT-11', team: 'DONATEAM', color: '#2d3436', img: 'images/hero/hero (3).jpg', desc: 'VinFast Lux A2.0 Plus 2021 màu đen', votes: { cleanest: 33 } },
-        { id: 'car-12', name: 'Quân Vũ', model: 'Ford Raptor 2023 Đen', plate: 'DNT-12', team: 'DONATEAM', color: '#353b48', img: 'images/hero/hero (4).jpg', desc: 'Ford Ranger Raptor 2023 đen hầm hố', votes: { endurance_obj: 45 } },
-        { id: 'car-13', name: 'Ngô Tiến Long', model: 'Civic Gen 10 Trắng', plate: 'DNT-13', team: 'DONATEAM', color: '#dcdde1', img: 'images/donafest.jpg', desc: 'Honda Civic Gen 10 trắng tinh tế', votes: { street_fighter: 32 } },
-        { id: 'car-14', name: 'Tạ Quốc Thịnh', model: 'Xe DONAFEST 2026', plate: 'DNT-14', team: 'DONATEAM', color: '#9b5de5', img: 'images/donagala.jpg', desc: 'Xế chiến tham gia DONAFEST 2026', votes: { cows_bell: 15 } },
-        { id: 'car-15', name: 'Đàm Xuân Tụ', model: 'Honda Civic Gen8 2009 Đen', plate: 'DNT-15', team: 'DONATEAM', color: '#576574', img: 'images/donatrip.jpg', desc: 'Honda Civic Gen8 2009 đen kì cựu', votes: { endurance_obj: 50 } },
-        { id: 'car-16', name: 'Nguyễn Việt Anh', model: 'BMW 330 G20 Tím Đậm', plate: 'DNT-16', team: 'DONATEAM', color: '#833471', img: 'images/venue.jpg', desc: 'BMW 330i G20 màu tím đậm độc lạ', votes: { best_build: 62 } },
-        { id: 'car-17', name: 'Đào Mạnh Tuấn', model: 'Honda Accord Gen 8 Xám Bạc', plate: 'DNT-17', team: 'DONATEAM', color: '#c8d6e5', img: 'images/hero/hero (1).jpg', desc: 'Honda Accord Gen 8 xám bạc thanh lịch', votes: { realism_bro: 27 } },
-        { id: 'car-18', name: 'Đặng Thành Luân', model: 'Honda Civic RS Gen 11 Đỏ Đun', plate: 'DNT-18', team: 'DONATEAM', color: '#8395a7', img: 'images/hero/hero (2).jpg', desc: 'Honda Civic RS Gen 11 màu đỏ đun', votes: { car_choice: 35 } },
-        { id: 'car-19', name: 'Đoàn Trọng Huỳnh', model: 'Mini Cooper R53 Cam', plate: 'DNT-19', team: 'DONATEAM', color: '#ff6b6b', img: 'images/hero/hero (3).jpg', desc: 'Mini Cooper R53 màu cam nổi bật', votes: { unique_abs: 48 } },
-        { id: 'car-20', name: 'Nguyễn Huânn', model: 'Vinfast VF3 Trắng', plate: 'DNT-20', team: 'DONATEAM', color: '#f78fb3', img: 'images/hero/hero (4).jpg', desc: 'VinFast VF3 trắng dễ thương', votes: { lord_lo: 55 } },
-        { id: 'car-21', name: 'Kiệt Đinh', model: 'BMW F30 Đỏ Đậm', plate: 'DNT-21', team: 'DONATEAM', color: '#b71540', img: 'images/donafest.jpg', desc: 'BMW F30 màu đỏ đậm cuốn hút', votes: { too_loud: 40 } },
-        { id: 'car-22', name: 'Khánh Nguyễn', model: 'BMW F32 Cam', plate: 'DNT-22', team: 'DONATEAM', color: '#e67e22', img: 'images/donagala.jpg', desc: 'BMW F32 Coupe màu cam rực rỡ', votes: { best_style: 58 } },
-        { id: 'car-23', name: 'Lê Trần Trung Hiếu', model: 'BMW F30 B48 2017 Trắng', plate: 'DNT-23', team: 'DONATEAM', color: '#f1f2f6', img: 'images/donatrip.jpg', desc: 'BMW F30 B48 2017 màu trắng', votes: { techguy: 36 } },
-        { id: 'car-24', name: 'Lê Tuấn Anh', model: 'Honda City Xám', plate: 'DNT-24', team: 'DONATEAM', color: '#718093', img: 'images/venue.jpg', desc: 'Honda City màu xám linh hoạt', votes: { cows_bell: 40 } },
-        { id: 'car-25', name: 'Đặng Đức Anh', model: 'Mercedes C300 Xám Xi Măng', plate: 'DNT-25', team: 'DONATEAM', color: '#95a5a6', img: 'images/hero/hero (1).jpg', desc: 'Mercedes-Benz C300 AMG xám xi măng', votes: { cleanest: 52 } }
+        { id: 'car-1', name: 'Hoàng Tùng', model: 'BMW 640i F06 2012 Đen', plate: 'DNT-01', team: 'DONATEAM', color: '#1e1e1e', img: 'images/hero/hero (1).jpg', desc: 'BMW 640i F06 Gran Coupe màu đen độc bản', votes: {} },
+        { id: 'car-2', name: 'Trịnh Quốc Trung', model: 'HONDA - CIVIC FE Trắng', plate: 'DNT-02', team: 'DONATEAM', color: '#f5f6fa', img: 'images/hero/hero (2).jpg', desc: 'Honda Civic FE màu trắng thể thao', votes: {} },
+        { id: 'car-3', name: 'Ngô Quang Nghĩa', model: 'BMW 520i Cát Hải Xanh Xám', plate: 'DNT-03', team: 'DONATEAM', color: '#546de5', img: 'images/hero/hero (3).jpg', desc: 'BMW 520i Cát Hải xanh xám sang trọng', votes: {} },
+        { id: 'car-4', name: 'Nguyễn Quốc Hưng', model: 'BMW F30 B48 2016 Xanh Sáng', plate: 'DNT-04', team: 'DONATEAM', color: '#00d2d3', img: 'images/hero/hero (4).jpg', desc: 'BMW F30 B48 động cơ 2016 xanh sáng', votes: {} },
+        { id: 'car-5', name: 'Nguyễn Thu Đức Trung', model: 'Honda Civic RS 2023 Trắng', plate: 'DNT-05', team: 'DONATEAM', color: '#ffffff', img: 'images/donafest.jpg', desc: 'Honda Civic RS 2023 trắng cá tính', votes: {} },
+        { id: 'car-6', name: 'Nguyễn Khánh Duy', model: 'Vinfast VF3 2025', plate: 'DNT-06', team: 'DONATEAM', color: '#ff9f43', img: 'images/donagala.jpg', desc: 'VinFast VF3 điện đô thị 2025', votes: {} },
+        { id: 'car-7', name: 'Vũ Tùng Dương', model: 'Vinfast VF3 2025', plate: 'DNT-07', team: 'DONATEAM', color: '#ee5253', img: 'images/donatrip.jpg', desc: 'VinFast VF3 2025 siêu chất', votes: {} },
+        { id: 'car-8', name: 'Tran Ngoc Hieu (Lee Tran)', model: 'Vinfast Limo Green 2026 Đen', plate: 'DNT-08', team: 'DONATEAM', color: '#10ac84', img: 'images/venue.jpg', desc: 'VinFast Limo Green 2026 đen VIP', votes: {} },
+        { id: 'car-9', name: 'Nguyễn Văn Tùng', model: 'HONDA CIVIC RS 2020 Đỏ', plate: 'DNT-09', team: 'DONATEAM', color: '#ff0000', img: 'images/hero/hero (1).jpg', desc: 'Honda Civic RS 2020 đỏ rực rỡ', votes: {} },
+        { id: 'car-10', name: 'Nguyễn Thanh Tùng', model: 'Civic Gen8 Đen Trắng', plate: 'DNT-10', team: 'DONATEAM', color: '#2f3640', img: 'images/hero/hero (2).jpg', desc: 'Honda Civic Gen8 màu đen trắng', votes: {} },
+        { id: 'car-11', name: 'Trương Hùng', model: 'Vinfast Lux A Plus 2021 Đen', plate: 'DNT-11', team: 'DONATEAM', color: '#2d3436', img: 'images/hero/hero (3).jpg', desc: 'VinFast Lux A2.0 Plus 2021 màu đen', votes: {} },
+        { id: 'car-12', name: 'Quân Vũ', model: 'Ford Raptor 2023 Đen', plate: 'DNT-12', team: 'DONATEAM', color: '#353b48', img: 'images/hero/hero (4).jpg', desc: 'Ford Ranger Raptor 2023 đen hầm hố', votes: {} },
+        { id: 'car-13', name: 'Ngô Tiến Long', model: 'Civic Gen 10 Trắng', plate: 'DNT-13', team: 'DONATEAM', color: '#dcdde1', img: 'images/donafest.jpg', desc: 'Honda Civic Gen 10 trắng tinh tế', votes: {} },
+        { id: 'car-14', name: 'Tạ Quốc Thịnh', model: 'Xe DONAFEST 2026', plate: 'DNT-14', team: 'DONATEAM', color: '#9b5de5', img: 'images/donagala.jpg', desc: 'Xế chiến tham gia DONAFEST 2026', votes: {} },
+        { id: 'car-15', name: 'Đàm Xuân Tụ', model: 'Honda Civic Gen8 2009 Đen', plate: 'DNT-15', team: 'DONATEAM', color: '#576574', img: 'images/donatrip.jpg', desc: 'Honda Civic Gen8 2009 đen kì cựu', votes: {} },
+        { id: 'car-16', name: 'Nguyễn Việt Anh', model: 'BMW 330 G20 Tím Đậm', plate: 'DNT-16', team: 'DONATEAM', color: '#833471', img: 'images/venue.jpg', desc: 'BMW 330i G20 màu tím đậm độc lạ', votes: {} },
+        { id: 'car-17', name: 'Đào Mạnh Tuấn', model: 'Honda Accord Gen 8 Xám Bạc', plate: 'DNT-17', team: 'DONATEAM', color: '#c8d6e5', img: 'images/hero/hero (1).jpg', desc: 'Honda Accord Gen 8 xám bạc thanh lịch', votes: {} },
+        { id: 'car-18', name: 'Đặng Thành Luân', model: 'Honda Civic RS Gen 11 Đỏ Đun', plate: 'DNT-18', team: 'DONATEAM', color: '#8395a7', img: 'images/hero/hero (2).jpg', desc: 'Honda Civic RS Gen 11 màu đỏ đun', votes: {} },
+        { id: 'car-19', name: 'Đoàn Trọng Huỳnh', model: 'Mini Cooper R53 Cam', plate: 'DNT-19', team: 'DONATEAM', color: '#ff6b6b', img: 'images/hero/hero (3).jpg', desc: 'Mini Cooper R53 màu cam nổi bật', votes: {} },
+        { id: 'car-20', name: 'Nguyễn Huânn', model: 'Vinfast VF3 Trắng', plate: 'DNT-20', team: 'DONATEAM', color: '#f78fb3', img: 'images/hero/hero (4).jpg', desc: 'VinFast VF3 trắng dễ thương', votes: {} },
+        { id: 'car-21', name: 'Kiệt Đinh', model: 'BMW F30 Đỏ Đậm', plate: 'DNT-21', team: 'DONATEAM', color: '#b71540', img: 'images/donafest.jpg', desc: 'BMW F30 màu đỏ đậm cuốn hút', votes: {} },
+        { id: 'car-22', name: 'Khánh Nguyễn', model: 'BMW F32 Cam', plate: 'DNT-22', team: 'DONATEAM', color: '#e67e22', img: 'images/donagala.jpg', desc: 'BMW F32 Coupe màu cam rực rỡ', votes: {} },
+        { id: 'car-23', name: 'Lê Trần Trung Hiếu', model: 'BMW F30 B48 2017 Trắng', plate: 'DNT-23', team: 'DONATEAM', color: '#f1f2f6', img: 'images/donatrip.jpg', desc: 'BMW F30 B48 2017 màu trắng', votes: {} },
+        { id: 'car-24', name: 'Lê Tuấn Anh', model: 'Honda City Xám', plate: 'DNT-24', team: 'DONATEAM', color: '#718093', img: 'images/venue.jpg', desc: 'Honda City màu xám linh hoạt', votes: {} },
+        { id: 'car-25', name: 'Đặng Đức Anh', model: 'Mercedes C300 Xám Xi Măng', plate: 'DNT-25', team: 'DONATEAM', color: '#95a5a6', img: 'images/hero/hero (1).jpg', desc: 'Mercedes-Benz C300 AMG xám xi măng', votes: {} }
     ];
 
     // ====== 4. STORAGE & CONFIG ======
@@ -172,33 +172,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let raceWinnersHistory = getStoredData('dnt_race_winners_2026', []);
 
-    // DEVICE FINGERPRINT
+    // DEVICE FINGERPRINT & RESET VERSION TRACKING
     let deviceId = localStorage.getItem('dnt_device_id');
     if (!deviceId) {
         deviceId = 'dev-' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
         localStorage.setItem('dnt_device_id', deviceId);
     }
     let votedCategories = getStoredData('dnt_voted_cats_' + deviceId, {});
+    let voteResetVersion = getStoredData('dnt_vote_reset_ver', 0);
 
-    // ====== REALTIME CLOUD DB SYNC ENGINE (restful-api.dev) ======
+    // ====== REALTIME CLOUD DB SYNC ENGINE ======
     const CLOUD_DB_ID = 'ff8081819f7e10ae019fefeaa4fe234b';
     const CLOUD_DB_URL = `https://api.restful-api.dev/objects/${CLOUD_DB_ID}`;
     let isCloudSyncing = false;
-
-    function mergeCloudCars(localCars, cloudCars) {
-        if (!cloudCars || !Array.isArray(cloudCars)) return localCars;
-        return localCars.map(lCar => {
-            const cCar = cloudCars.find(c => c.id === lCar.id);
-            if (!cCar) return lCar;
-            const mergedVotes = { ...(lCar.votes || {}) };
-            if (cCar.votes) {
-                Object.keys(cCar.votes).forEach(catId => {
-                    mergedVotes[catId] = Math.max(mergedVotes[catId] || 0, cCar.votes[catId] || 0);
-                });
-            }
-            return { ...lCar, votes: mergedVotes };
-        });
-    }
 
     async function syncCloudData() {
         if (isCloudSyncing) return;
@@ -210,23 +196,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (cloudObj && cloudObj.data) {
                     const cData = cloudObj.data;
 
-                    if (cData.cars) {
-                        carsData = mergeCloudCars(carsData, cData.cars);
+                    // 1. Check if BQT performed a Vote Reset on Cloud
+                    if (cData.voteResetVersion && cData.voteResetVersion > voteResetVersion) {
+                        voteResetVersion = cData.voteResetVersion;
+                        setStoredData('dnt_vote_reset_ver', voteResetVersion);
+                        votedCategories = {};
+                        setStoredData('dnt_voted_cats_' + deviceId, {});
+                    }
+
+                    // 2. Sync Cars & Votes (Cloud DB is Single Ground Truth)
+                    if (cData.cars && Array.isArray(cData.cars)) {
+                        carsData = cData.cars;
                         setStoredData('dnt_cars_official_v3', carsData);
                     }
+
+                    // 3. Sync Leaderboard Toggles
                     if (cData.leaderboardToggles) {
                         leaderboardToggles = cData.leaderboardToggles;
                         setStoredData('dnt_leaderboard_toggles', leaderboardToggles);
                     }
+
+                    // 4. Sync Shoutout Data
                     if (cData.shoutoutData) {
                         shoutoutData = cData.shoutoutData;
                         setStoredData('dnt_shoutouts_2026', shoutoutData);
                     }
-                    if (cData.raceWinnersHistory && cData.raceWinnersHistory.length > 0) {
+
+                    // 5. Sync Race Winners & Completed Prizes
+                    if (cData.raceWinnersHistory !== undefined) {
                         raceWinnersHistory = cData.raceWinnersHistory;
                         setStoredData('dnt_race_winners_2026', raceWinnersHistory);
                     }
-                    if (cData.completedPrizes) {
+                    if (cData.completedPrizes !== undefined) {
                         completedPrizes = cData.completedPrizes;
                         setStoredData('dnt_completed_prizes_2026', completedPrizes);
                     }
@@ -256,6 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         shoutoutData: shoutoutData,
                         raceWinnersHistory: raceWinnersHistory,
                         completedPrizes: completedPrizes,
+                        voteResetVersion: voteResetVersion,
                         lastUpdated: new Date().toISOString()
                     }
                 })
@@ -263,9 +265,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch(e) {}
     }
 
-    // Initial sync & start 4s auto-polling
+    // Initial sync & start 2.5s auto-polling for instant multi-device synchronization
     syncCloudData();
-    setInterval(syncCloudData, 4000);
+    setInterval(syncCloudData, 2500);
 
 
     // Web Audio Synth
@@ -938,24 +940,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function castVote(carId, catId) {
+    async function castVote(carId, catId) {
         if (votedCategories[catId]) return;
 
-        const car = carsData.find(c => c.id === carId);
-        if (!car) return;
-
-        if (!car.votes) car.votes = {};
-        car.votes[catId] = (car.votes[catId] || 0) + 1;
+        // Mark device vote lock locally first
         votedCategories[catId] = carId;
-
-        setStoredData('dnt_cars_official_v3', carsData);
         setStoredData('dnt_voted_cats_' + deviceId, votedCategories);
 
-        // Push real-time vote to Cloud DB immediately
-        pushCloudData();
+        // Fetch fresh Cloud DB votes to get latest state before incrementing
+        try {
+            const res = await fetch(CLOUD_DB_URL);
+            if (res.ok) {
+                const cloudObj = await res.json();
+                if (cloudObj && cloudObj.data && Array.isArray(cloudObj.data.cars)) {
+                    carsData = cloudObj.data.cars;
+                }
+            }
+        } catch(e) {}
+
+        const car = carsData.find(c => c.id === carId);
+        if (car) {
+            if (!car.votes) car.votes = {};
+            car.votes[catId] = (car.votes[catId] || 0) + 1;
+            setStoredData('dnt_cars_official_v3', carsData);
+        }
+
+        // Push real-time vote count directly to Cloud DB
+        await pushCloudData();
 
         playSound('go');
-        alert(`🎉 Cảm ơn bạn! Đã bình chọn thành công cho [${car.model} - ${car.name}] trong hạng mục!`);
+        alert(`🎉 Cảm ơn bạn! Đã bình chọn thành công cho [${car ? car.model : ''} - ${car ? car.name : ''}]!`);
         renderVotingSection();
     }
     renderVotingSection();
@@ -1238,7 +1252,7 @@ document.addEventListener('DOMContentLoaded', () => {
         animationFrameId = requestAnimationFrame(runRace5sLoop);
     }
 
-    function onDntRaceFinished() {
+    async function onDntRaceFinished() {
         playSound('win');
 
         const prizeInfo = getCurrentPrizeInfo();
@@ -1260,7 +1274,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setStoredData('dnt_race_winners_2026', raceWinnersHistory);
 
         // Push real-time race results to Cloud DB
-        pushCloudData();
+        await pushCloudData();
         renderPublicRaceLeaderboard();
 
         setTimeout(() => {
@@ -1350,7 +1364,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
 
         listEl.querySelectorAll('.btn-prize-up').forEach((btn, idx) => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', async (e) => {
                 e.preventDefault();
                 if (idx > 0) {
                     const temp = racePrizesOrder[idx];
@@ -1358,13 +1372,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     racePrizesOrder[idx - 1] = temp;
                     setStoredData('dnt_race_prizes_order', racePrizesOrder);
                     renderRacePrizesOrderList();
-                    pushCloudData();
+                    await pushCloudData();
                 }
             });
         });
 
         listEl.querySelectorAll('.btn-prize-down').forEach((btn, idx) => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', async (e) => {
                 e.preventDefault();
                 if (idx < racePrizesOrder.length - 1) {
                     const temp = racePrizesOrder[idx];
@@ -1372,7 +1386,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     racePrizesOrder[idx + 1] = temp;
                     setStoredData('dnt_race_prizes_order', racePrizesOrder);
                     renderRacePrizesOrderList();
-                    pushCloudData();
+                    await pushCloudData();
                 }
             });
         });
@@ -1387,7 +1401,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (document.getElementById('quotaThird')) document.getElementById('quotaThird').value = prizeQuotas.third || 3;
         if (document.getElementById('quotaConsolation')) document.getElementById('quotaConsolation').value = prizeQuotas.consolation || 5;
 
-        savePrizeQuotaBtn.addEventListener('click', (e) => {
+        savePrizeQuotaBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             e.stopPropagation();
 
@@ -1398,7 +1412,7 @@ document.addEventListener('DOMContentLoaded', () => {
             prizeQuotas.consolation = parseInt(document.getElementById('quotaConsolation').value) || 5;
 
             setStoredData('dnt_prize_quotas', prizeQuotas);
-            pushCloudData();
+            await pushCloudData();
             alert('💾 Đã lưu cấu hình số lượng giải thưởng thành công!');
         });
     }
@@ -1413,7 +1427,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (document.getElementById('adminPark2')) document.getElementById('adminPark2').value = shoutoutData.parking2 || '';
         if (document.getElementById('adminPark3')) document.getElementById('adminPark3').value = shoutoutData.parking3 || '';
 
-        saveShoutoutBtn.addEventListener('click', (e) => {
+        saveShoutoutBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             e.stopPropagation();
 
@@ -1425,7 +1439,7 @@ document.addEventListener('DOMContentLoaded', () => {
             shoutoutData.parking3 = document.getElementById('adminPark3').value.trim();
 
             setStoredData('dnt_shoutouts_2026', shoutoutData);
-            pushCloudData();
+            await pushCloudData();
             renderPublicLeaderboard();
             alert('💾 Đã cập nhật và đồng bộ Cloud thông tin Vinh Danh thành công!');
         });
@@ -1456,11 +1470,11 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
 
         listEl.querySelectorAll('.lb-toggle-checkbox').forEach(cb => {
-            cb.addEventListener('change', (e) => {
+            cb.addEventListener('change', async (e) => {
                 const key = e.target.getAttribute('data-key');
                 leaderboardToggles[key] = e.target.checked;
                 setStoredData('dnt_leaderboard_toggles', leaderboardToggles);
-                pushCloudData();
+                await pushCloudData();
                 renderPublicLeaderboard();
                 renderVotingSection();
             });
@@ -1484,7 +1498,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
 
         listEl.querySelectorAll('.btn-cat-up').forEach((btn, idx) => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', async (e) => {
                 e.preventDefault();
                 if (idx > 0) {
                     const temp = categoriesList[idx];
@@ -1493,13 +1507,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     setStoredData('dnt_categories_order', categoriesList);
                     renderCategoriesOrderList();
                     renderVotingCategoriesNav();
-                    pushCloudData();
+                    await pushCloudData();
                 }
             });
         });
 
         listEl.querySelectorAll('.btn-cat-down').forEach((btn, idx) => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', async (e) => {
                 e.preventDefault();
                 if (idx < categoriesList.length - 1) {
                     const temp = categoriesList[idx];
@@ -1508,7 +1522,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     setStoredData('dnt_categories_order', categoriesList);
                     renderCategoriesOrderList();
                     renderVotingCategoriesNav();
-                    pushCloudData();
+                    await pushCloudData();
                 }
             });
         });
@@ -1531,7 +1545,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
 
         listEl.querySelectorAll('.btn-up').forEach((btn, idx) => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', async (e) => {
                 e.preventDefault();
                 if (idx > 0) {
                     const temp = presentationOrder[idx];
@@ -1539,13 +1553,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     presentationOrder[idx - 1] = temp;
                     setStoredData('dnt_presentation_order', presentationOrder);
                     renderPresentationOrderList();
-                    pushCloudData();
+                    await pushCloudData();
                 }
             });
         });
 
         listEl.querySelectorAll('.btn-down').forEach((btn, idx) => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', async (e) => {
                 e.preventDefault();
                 if (idx < presentationOrder.length - 1) {
                     const temp = presentationOrder[idx];
@@ -1553,34 +1567,44 @@ document.addEventListener('DOMContentLoaded', () => {
                     presentationOrder[idx + 1] = temp;
                     setStoredData('dnt_presentation_order', presentationOrder);
                     renderPresentationOrderList();
-                    pushCloudData();
+                    await pushCloudData();
                 }
             });
         });
     }
 
-    document.getElementById('adminResetDefaultCarsBtn')?.addEventListener('click', (e) => {
+    document.getElementById('adminResetDefaultCarsBtn')?.addEventListener('click', async (e) => {
         e.preventDefault();
         carsData = [...OFFICIAL_25_CARS];
         setStoredData('dnt_cars_official_v3', carsData);
-        pushCloudData();
+        await pushCloudData();
         renderVotingSection();
         alert('✅ Đã khôi phục danh sách 25 thí sinh gốc!');
     });
 
-    document.getElementById('adminResetVotesBtn')?.addEventListener('click', (e) => {
+    // RESET VOTES + CLEAR ALL DEVICE LOCKS HANDLER
+    document.getElementById('adminResetVotesBtn')?.addEventListener('click', async (e) => {
         e.preventDefault();
-        if (confirm('⚠️ Reset toàn bộ lượt bình chọn về 0 trên Cloud và tất cả thiết bị?')) {
+        if (confirm('⚠️ Reset toàn bộ lượt bình chọn về 0 trên Cloud và mở lại quyền vote cho TẤT CẢ THIẾT BỊ?')) {
+            // 1. Reset votes on all 25 cars
             carsData.forEach(c => c.votes = {});
             setStoredData('dnt_cars_official_v3', carsData);
-            pushCloudData();
+
+            // 2. Increment Cloud Reset Version to automatically unlock all devices!
+            voteResetVersion = Date.now();
+            setStoredData('dnt_vote_reset_ver', voteResetVersion);
+            votedCategories = {};
+            setStoredData('dnt_voted_cats_' + deviceId, {});
+
+            // 3. Push Cloud State
+            await pushCloudData();
             renderVotingSection();
-            alert('✅ Đã reset đồng bộ Cloud tất cả lượt bình chọn!');
+            alert('✅ Đã reset thành công tất cả lượt bình chọn & mở lại quyền vote cho TẤT CẢ THIẾT BỊ!');
         }
     });
 
     // RESET DNT LUCKY RACE RESULTS BUTTON HANDLER
-    document.getElementById('adminResetRaceBtn')?.addEventListener('click', (e) => {
+    document.getElementById('adminResetRaceBtn')?.addEventListener('click', async (e) => {
         e.preventDefault();
         if (confirm('⚠️ Bạn có chắc chắn muốn reset toàn bộ kết quả trao giải DNT Lucky Race?')) {
             raceWinnersHistory = [];
@@ -1588,7 +1612,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentRacePrizeKey = 'consolation';
             setStoredData('dnt_race_winners_2026', raceWinnersHistory);
             setStoredData('dnt_completed_prizes_2026', completedPrizes);
-            pushCloudData();
+            await pushCloudData();
             renderPublicRaceLeaderboard();
             renderPublicLeaderboard();
             renderRacePrizesOrderList();
