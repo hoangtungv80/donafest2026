@@ -67,8 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'techguy', icon: '💻', title: 'Techguy', desc: 'Xe sở hữu nhiều trang bị công nghệ hiện đại nhất' }
     ];
 
-    // ====== 3. OFFICIAL 23 PARTICIPANTS ROSTER ======
-    const OFFICIAL_23_CARS = [
+    // ====== 3. OFFICIAL 24 PARTICIPANTS ROSTER ======
+    const OFFICIAL_24_CARS = [
         { id: 'car-1', name: 'Hoàng Tùng', model: 'BMW 640i F06 2012', plate: 'DNT-01', team: 'DONATEAM', color: '#1e1e1e', img: 'images/cars/car-1.jpg', desc: 'BMW 640i F06 Gran Coupe 2012', votes: {} },
         { id: 'car-2', name: 'Trịnh Quốc Trung', model: 'Honda Civic FE', plate: 'DNT-02', team: 'DONATEAM', color: '#f5f6fa', img: 'images/cars/car-2.jpg', desc: 'Honda Civic FE thể thao', votes: {} },
         { id: 'car-3', name: 'Ngô Quang Nghĩa', model: 'BMW 520i Cát Hải', plate: 'DNT-03', team: 'DONATEAM', color: '#546de5', img: 'images/cars/car-3.jpg', desc: 'BMW 520i Cát Hải sang trọng', votes: {} },
@@ -91,9 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'car-20', name: 'Khánh Nguyễn', model: 'BMW F32', plate: 'DNT-20', team: 'DONATEAM', color: '#e67e22', img: 'images/cars/car-20.jpg', desc: 'BMW F32 Coupe rực rỡ', votes: {} },
         { id: 'car-21', name: 'Lê Trần Trung Hiếu', model: 'BMW F30 B48 2017', plate: 'DNT-21', team: 'DONATEAM', color: '#f1f2f6', img: 'images/cars/car-21.jpg', desc: 'BMW F30 B48 2017', votes: {} },
         { id: 'car-22', name: 'Lê Tuấn Anh', model: 'Honda City', plate: 'DNT-22', team: 'DONATEAM', color: '#718093', img: 'images/cars/car-22.jpg', desc: 'Honda City linh hoạt', votes: {} },
-        { id: 'car-23', name: 'Đặng Đức Anh', model: 'Mercedes C300', plate: 'DNT-23', team: 'DONATEAM', color: '#95a5a6', img: 'images/cars/car-23.jpg', desc: 'Mercedes-Benz C300 AMG', votes: {} }
+        { id: 'car-23', name: 'Đặng Đức Anh', model: 'Mercedes C300', plate: 'DNT-23', team: 'DONATEAM', color: '#95a5a6', img: 'images/cars/car-23.jpg', desc: 'Mercedes-Benz C300 AMG', votes: {} },
+        { id: 'car-24', name: 'Long Hoàng Huy', model: 'BMW 520i F10', plate: 'DNT-24', team: 'DONATEAM', color: '#3c6382', img: 'images/cars/car-24.jpg', desc: 'BMW 520i F10 sang trọng', votes: {} }
     ];
-    const OFFICIAL_25_CARS = OFFICIAL_23_CARS;
+    const OFFICIAL_25_CARS = OFFICIAL_24_CARS;
 
     // ====== 4. STORAGE & CONFIG ======
     function getStoredData(key, defaultVal) {
@@ -1687,12 +1688,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('adminResetDefaultCarsBtn')?.addEventListener('click', async (e) => {
         e.preventDefault();
-        carsData = [...OFFICIAL_25_CARS];
+        carsData = [...OFFICIAL_24_CARS];
         carsData.forEach(c => c.votes = {});
         setStoredData('dnt_cars_official_v3', carsData);
         await pushCloudData();
         renderVotingSection();
-        alert('✅ Đã khôi phục danh sách 25 thí sinh gốc!');
+        alert('✅ Đã khôi phục danh sách 24 thí sinh gốc!');
     });
 
     // RESET VOTES + CLEAR ALL DEVICE LOCKS HANDLER
