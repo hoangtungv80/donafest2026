@@ -1190,7 +1190,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        const laneHeight = canvas.height / 25;
+        const totalLanes = carsData.length || 30;
+        const laneHeight = canvas.height / totalLanes;
 
         raceCars = carsData.map((car, index) => ({
             ...car,
@@ -1215,9 +1216,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        const laneHeight = canvas.height / 25;
+        const totalLanes = raceCars.length || carsData.length || 30;
+        const laneHeight = canvas.height / totalLanes;
 
-        for (let i = 0; i < 25; i++) {
+        for (let i = 0; i < totalLanes; i++) {
             const y = i * laneHeight;
 
             ctx.fillStyle = (i % 2 === 0) ? '#0d0c1d' : '#121126';
@@ -1231,7 +1233,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.stroke();
 
             ctx.fillStyle = '#6b6893';
-            ctx.font = 'bold 11px Outfit, sans-serif';
+            ctx.font = 'bold 10px Outfit, sans-serif';
             ctx.fillText(`Làn ${i + 1}`, 6, y + laneHeight / 2 + 4);
         }
 
@@ -1294,13 +1296,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const N = prizeInfo.quota;
 
-        const alreadyWonCarIds = new Set(raceWinnersHistory.map(w => w.carId || w.name));
-        const eligibleCars = raceCars.filter(c => !alreadyWonCarIds.has(c.id) && !alreadyWonCarIds.has(c.name));
+        // ====== TIERED FAIR RANDOM WINNER SELECTION ALGORITHM ======
+        // 1. Calculate historical win count for every car in the race
+        const winCountMap = {};
+        raceCars.forEach(c => { winCountMap[c.id] = 0; });
+        raceWinnersHistory.forEach(w => {
+            const matchedCar = raceCars.find(c => c.id === w.carId || c.name === w.name);
+            if (matchedCar) {
+                winCountMap[matchedCar.id] = (winCountMap[matchedCar.id] || 0) + 1;
+            }
+        });
 
-        let pool = eligibleCars.length >= N ? eligibleCars : (eligibleCars.length > 0 ? eligibleCars : raceCars);
+        // 2. Group cars into buckets by their win count (0 wins, 1 win, 2 wins, ...)
+        const buckets = {};
+        raceCars.forEach(car => {
+            const count = winCountMap[car.id] || 0;
+            if (!buckets[count]) buckets[count] = [];
+            buckets[count].push(car);
+        });
 
-        const shuffled = [...pool].sort(() => Math.random() - 0.5);
-        selectedWinnersForCurrentRace = shuffled.slice(0, N);
+        // 3. Fill N winners starting from lowest win-count buckets first
+        const sortedCounts = Object.keys(buckets).map(Number).sort((a, b) => a - b);
+        const selectedWinners = [];
+
+        for (const count of sortedCounts) {
+            if (selectedWinners.length >= N) break;
+
+            const bucketCars = buckets[count];
+            // Shuffle cars in this tier randomly
+            const shuffledBucket = [...bucketCars].sort(() => Math.random() - 0.5);
+
+            const needed = N - selectedWinners.length;
+            if (shuffledBucket.length <= needed) {
+                selectedWinners.push(...shuffledBucket);
+            } else {
+                selectedWinners.push(...shuffledBucket.slice(0, needed));
+            }
+        }
+
+        selectedWinnersForCurrentRace = selectedWinners.slice(0, N);
 
         raceCars.forEach(car => {
             const isTargetWinner = selectedWinnersForCurrentRace.some(w => w.id === car.id);
