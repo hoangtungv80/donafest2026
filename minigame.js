@@ -11,14 +11,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const portalPassBtn = document.getElementById('portalPassBtn');
 
     function checkPortalUnlock() {
-        if (document.referrer.includes('index.html')) {
-            sessionStorage.removeItem('dnt_portal_unlocked');
-        }
         const isUnlocked = sessionStorage.getItem('dnt_portal_unlocked');
         if (isUnlocked === 'true') {
-            portalLockOverlay?.classList.add('unlocked');
+            if (portalLockOverlay) {
+                portalLockOverlay.classList.add('unlocked');
+                portalLockOverlay.style.display = 'none';
+            }
         } else {
-            portalLockOverlay?.classList.remove('unlocked');
+            if (portalLockOverlay) {
+                portalLockOverlay.classList.remove('unlocked');
+                portalLockOverlay.style.display = 'flex';
+            }
         }
     }
     checkPortalUnlock();
@@ -40,13 +43,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function verifyPortalPasscode() {
-        const val = portalPassInput ? portalPassInput.value.trim() : '';
-        if (val.toUpperCase() === '2026DNT') {
+        const rawVal = portalPassInput ? portalPassInput.value.trim() : '';
+        const val = rawVal.replaceAll(' ', '').toUpperCase();
+        if (val === '2026DNT' || val === 'DNT2026') {
             sessionStorage.setItem('dnt_portal_unlocked', 'true');
-            portalLockOverlay?.classList.add('unlocked');
-            playSound('win');
+            if (portalLockOverlay) {
+                portalLockOverlay.classList.add('unlocked');
+                portalLockOverlay.style.display = 'none';
+            }
+            try { playSound('win'); } catch(err) {}
         } else {
-            alert('❌ Mã truy cập không đúng! Vui lòng liên hệ Ban Quản Trị.');
+            alert('❌ Mã truy cập không đúng! Vui lòng nhập mã: 2026DNT');
         }
     }
 
@@ -298,12 +305,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Web Audio Synth
     let soundEnabled = true;
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let audioCtx = null;
 
     function playSound(type) {
         if (!soundEnabled) return;
         try {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            if (!audioCtx) return;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
