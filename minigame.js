@@ -214,13 +214,15 @@ document.addEventListener('DOMContentLoaded', () => {
     let isCloudSyncing = false;
 
     async function fbGet(path) {
-        const res = await fetch(`${FB_URL}/${path}.json`, { cache: 'no-store' });
+        const url = path ? `${FB_URL}/${path}.json` : `${FB_URL}/.json`;
+        const res = await fetch(url, { cache: 'no-store' });
         if (!res.ok) return null;
         return res.json();
     }
 
     async function fbSet(path, data) {
-        await fetch(`${FB_URL}/${path}.json`, {
+        const url = path ? `${FB_URL}/${path}.json` : `${FB_URL}/.json`;
+        await fetch(url, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -228,7 +230,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function fbPatch(path, data) {
-        await fetch(`${FB_URL}/${path}.json`, {
+        const url = path ? `${FB_URL}/${path}.json` : `${FB_URL}/.json`;
+        await fetch(url, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -264,8 +267,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 setStoredData('dnt_leaderboard_toggles', leaderboardToggles);
             }
             if (cloudData.awardsConfig !== undefined) {
-                awardsConfig = Array.isArray(cloudData.awardsConfig) ? cloudData.awardsConfig : DEFAULT_AWARDS;
-                setStoredData('dnt_awards_config_2026', awardsConfig);
+                let rawAwards = cloudData.awardsConfig;
+                if (rawAwards && typeof rawAwards === 'object' && !Array.isArray(rawAwards)) {
+                    rawAwards = Object.values(rawAwards);
+                }
+                if (Array.isArray(rawAwards)) {
+                    const isEditingAwards = document.activeElement && document.activeElement.closest('#adminAwardsList');
+                    if (!isEditingAwards) {
+                        awardsConfig = rawAwards;
+                        setStoredData('dnt_awards_config_2026', awardsConfig);
+                    }
+                }
             }
             if (cloudData.winners !== undefined) {
                 raceWinnersHistory = Array.isArray(cloudData.winners) ? cloudData.winners : [];
@@ -275,9 +287,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 completedPrizes = cloudData.completed || {};
                 setStoredData('dnt_completed_prizes_2026', completedPrizes);
             }
-            if (cloudData.racePrizesConfig !== undefined && Array.isArray(cloudData.racePrizesConfig)) {
-                racePrizesConfig = cloudData.racePrizesConfig;
-                setStoredData('dnt_race_prizes_config', racePrizesConfig);
+            if (cloudData.racePrizesConfig !== undefined) {
+                let rawPrizes = cloudData.racePrizesConfig;
+                if (rawPrizes && typeof rawPrizes === 'object' && !Array.isArray(rawPrizes)) {
+                    rawPrizes = Object.values(rawPrizes);
+                }
+                if (Array.isArray(rawPrizes)) {
+                    const isEditingPrizes = document.activeElement && document.activeElement.closest('#racePrizesConfigList');
+                    if (!isEditingPrizes) {
+                        racePrizesConfig = rawPrizes;
+                        setStoredData('dnt_race_prizes_config', racePrizesConfig);
+                    }
+                }
             }
 
             renderVotingSection();
@@ -1436,6 +1457,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Helper: Sync current DOM inputs into racePrizesConfig before re-rendering or saving
+    function syncRacePrizesFromDOM() {
+        const listEl = document.getElementById('racePrizesConfigList');
+        if (!listEl) return;
+        const newPrizes = [];
+        listEl.querySelectorAll('.race-prize-config-row').forEach(row => {
+            const prizeId = row.getAttribute('data-prize-id');
+            const nameInput = row.querySelector('.race-prize-name-input');
+            const quotaInput = row.querySelector('.race-prize-quota-input');
+            newPrizes.push({
+                id: prizeId || ('prize-' + Date.now() + Math.random().toString(36).substring(2, 6)),
+                name: (nameInput ? nameInput.value.trim() : '') || 'Giải',
+                quota: quotaInput ? (parseInt(quotaInput.value) || 1) : 1
+            });
+        });
+        if (newPrizes.length > 0) {
+            racePrizesConfig = newPrizes;
+        }
+    }
+
     // ====== DYNAMIC RACE PRIZES CONFIG RENDERER ======
     function renderRacePrizesConfigList() {
         const listEl = document.getElementById('racePrizesConfigList');
@@ -1469,6 +1510,7 @@ document.addEventListener('DOMContentLoaded', () => {
         listEl.querySelectorAll('.remove-race-prize-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
+                syncRacePrizesFromDOM();
                 const prizeId = btn.getAttribute('data-prize-id');
                 if (confirm('Xóa giải này? Dữ liệu kết quả đua liên quan sẽ không bị xóa.')) {
                     racePrizesConfig = racePrizesConfig.filter(p => p.id !== prizeId);
@@ -1481,6 +1523,7 @@ document.addEventListener('DOMContentLoaded', () => {
         listEl.querySelectorAll('.btn-race-prize-up').forEach((btn, idx) => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
+                syncRacePrizesFromDOM();
                 if (idx > 0) {
                     [racePrizesConfig[idx], racePrizesConfig[idx - 1]] = [racePrizesConfig[idx - 1], racePrizesConfig[idx]];
                     renderRacePrizesConfigList();
@@ -1492,6 +1535,7 @@ document.addEventListener('DOMContentLoaded', () => {
         listEl.querySelectorAll('.btn-race-prize-down').forEach((btn, idx) => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
+                syncRacePrizesFromDOM();
                 if (idx < racePrizesConfig.length - 1) {
                     [racePrizesConfig[idx], racePrizesConfig[idx + 1]] = [racePrizesConfig[idx + 1], racePrizesConfig[idx]];
                     renderRacePrizesConfigList();
@@ -1503,6 +1547,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add new prize button
     document.getElementById('adminAddRacePrizeBtn')?.addEventListener('click', (e) => {
         e.preventDefault();
+        syncRacePrizesFromDOM();
         racePrizesConfig.push({
             id: 'prize-' + Date.now(),
             name: `🎁 GIẢI MỚI #${racePrizesConfig.length + 1}`,
@@ -1514,25 +1559,33 @@ document.addEventListener('DOMContentLoaded', () => {
     // Save prize config button
     document.getElementById('saveRacePrizesBtn')?.addEventListener('click', async (e) => {
         e.preventDefault();
-        // Collect latest values from inputs
-        const listEl = document.getElementById('racePrizesConfigList');
-        if (listEl) {
-            listEl.querySelectorAll('.race-prize-config-row').forEach(row => {
-                const prizeId = row.getAttribute('data-prize-id');
-                const item = racePrizesConfig.find(p => p.id === prizeId);
-                if (item) {
-                    const nameInput = row.querySelector('.race-prize-name-input');
-                    const quotaInput = row.querySelector('.race-prize-quota-input');
-                    if (nameInput) item.name = nameInput.value.trim() || item.name;
-                    if (quotaInput) item.quota = parseInt(quotaInput.value) || 1;
-                }
-            });
-        }
+        syncRacePrizesFromDOM();
         setStoredData('dnt_race_prizes_config', racePrizesConfig);
         await pushCloudData();
         renderRacePrizesConfigList();
+        renderPublicRaceLeaderboard();
         alert('💾 Đã lưu & đồng bộ cấu hình giải DNT Lucky Race thành công!');
     });
+
+    // Helper: Sync current DOM inputs into awardsConfig before re-rendering or saving
+    function syncAwardsFromDOM() {
+        const container = document.getElementById('adminAwardsList');
+        if (!container) return;
+        const newAwards = [];
+        container.querySelectorAll('.award-config-row').forEach(row => {
+            const awardId = row.getAttribute('data-award-id');
+            const titleInput = row.querySelector('.award-title-input');
+            const select = row.querySelector('.award-car-select');
+            newAwards.push({
+                id: awardId || ('award-' + Date.now() + Math.random().toString(36).substring(2, 6)),
+                title: (titleInput ? titleInput.value.trim() : '') || 'Giải Vinh Danh',
+                carId: select ? select.value : ''
+            });
+        });
+        if (newAwards.length > 0) {
+            awardsConfig = newAwards;
+        }
+    }
 
     // DYNAMIC AWARDS CONFIG LIST RENDERER & EVENT HANDLERS
     function renderAdminAwardsList() {
@@ -1572,22 +1625,18 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         }).join('');
 
-        container.querySelectorAll('.award-title-input').forEach(input => {
-            input.addEventListener('change', (e) => {
-                const row = e.target.closest('.award-config-row');
-                const awardId = row.getAttribute('data-award-id');
-                const item = awardsConfig.find(a => a.id === awardId);
-                if (item) item.title = e.target.value.trim();
-            });
-        });
-
         container.querySelectorAll('.award-car-select').forEach(select => {
             select.addEventListener('change', (e) => {
+                const row = select.closest('.award-config-row');
                 const awardId = select.getAttribute('data-award-id');
+                const selectedCar = carsData.find(c => c.id === select.value);
+                const imgEl = row?.querySelector('.award-img-preview img');
+                if (imgEl) {
+                    imgEl.src = selectedCar ? (selectedCar.img || 'images/donafest.jpg') : 'images/donafest.jpg';
+                }
                 const item = awardsConfig.find(a => a.id === awardId);
                 if (item) {
-                    item.carId = e.target.value;
-                    renderAdminAwardsList();
+                    item.carId = select.value;
                 }
             });
         });
@@ -1595,6 +1644,7 @@ document.addEventListener('DOMContentLoaded', () => {
         container.querySelectorAll('.remove-award-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
+                syncAwardsFromDOM();
                 const awardId = btn.getAttribute('data-award-id');
                 awardsConfig = awardsConfig.filter(a => a.id !== awardId);
                 renderAdminAwardsList();
@@ -1604,6 +1654,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('adminAddAwardBtn')?.addEventListener('click', (e) => {
         e.preventDefault();
+        syncAwardsFromDOM();
         awardsConfig.push({
             id: 'award-' + Date.now(),
             title: `Giải Vinh Danh #${awardsConfig.length + 1}`,
@@ -1614,21 +1665,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('saveAwardsBtn')?.addEventListener('click', async (e) => {
         e.preventDefault();
-        const container = document.getElementById('adminAwardsList');
-        if (container) {
-            container.querySelectorAll('.award-config-row').forEach(row => {
-                const awardId = row.getAttribute('data-award-id');
-                const titleInput = row.querySelector('.award-title-input');
-                const select = row.querySelector('.award-car-select');
-                const item = awardsConfig.find(a => a.id === awardId);
-                if (item) {
-                    if (titleInput) item.title = titleInput.value.trim();
-                    if (select) item.carId = select.value;
-                }
-            });
-        }
+        syncAwardsFromDOM();
         setStoredData('dnt_awards_config_2026', awardsConfig);
         await pushCloudData();
+        renderAdminAwardsList();
         renderPublicLeaderboard();
         alert('💾 Đã cập nhật và đồng bộ Cloud danh sách Vinh Danh thành công!');
     });
