@@ -702,11 +702,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <div class="stage-race-controls">
                         <div class="current-prize-indicator-badge" id="stagePrizeBadge">
-                            ${isFinished ? `✅ ĐÃ TRAO GIẢI: ${prizeObj.name.toUpperCase()}` : `🏆 ĐANG QUAY: ${prizeObj.name.toUpperCase()}`}
+                            ${isFinished ? `✅ ĐÃ TRAO GIẢI: ${prizeObj.name.toUpperCase()}` : `🏆 ĐANG QUAY: ${prizeObj.name.toUpperCase()} (${prizeObj.quota || 1} XE)`}
                         </div>
                         <button type="button" id="stageRaceStartBtn" class="btn btn-primary btn-lg btn-glow">
                             <span>${isFinished ? `⏩ XEM VINH DANH (${prizeObj.name})` : `🏎️ BẮT ĐẦU ĐUA (${prizeObj.name.toUpperCase()})`}</span>
                         </button>
+                        ${isFinished ? `<button type="button" id="stageRaceRerunBtn" class="btn btn-secondary btn-sm" style="padding:8px 16px; border-radius:20px;" title="Hủy kết quả cũ và quay lại giải này"><span>↺ ĐUA LẠI</span></button>` : ''}
                     </div>
 
                     <div class="stage-canvas-wrapper">
@@ -728,6 +729,22 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         } else {
                             startDntLuckyRace();
+                        }
+                    });
+                }
+
+                const rerunBtn = document.getElementById('stageRaceRerunBtn');
+                if (rerunBtn) {
+                    rerunBtn.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        if (confirm(`Bạn có muốn hủy kết quả cũ và quay lại giải "${prizeObj.name}" (${prizeObj.quota || 1} xe) không?`)) {
+                            delete completedPrizes[currentRacePrizeId];
+                            raceWinnersHistory = raceWinnersHistory.filter(w => w.prizeId !== currentRacePrizeId && w.prize !== prizeObj.name);
+                            setStoredData('dnt_completed_prizes_2026', completedPrizes);
+                            setStoredData('dnt_race_winners_2026', raceWinnersHistory);
+                            await pushCloudData();
+                            renderCurrentHeroSlide();
+                            renderPublicRaceLeaderboard();
                         }
                     });
                 }
@@ -1180,7 +1197,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return {
             title: prizeObj.name,
             id: prizeObj.id,
-            quota: prizeObj.quota || 1
+            quota: parseInt(prizeObj.quota, 10) || 1
         };
     }
 
@@ -1558,7 +1575,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div style="display:flex; gap:8px; align-items:center;">
                     <span style="font-size:0.82rem; color:var(--text-secondary); white-space:nowrap;">Số xe thắng:</span>
                     <input type="number" class="race-prize-quota-input" value="${prize.quota}" min="1" max="30" style="width:70px; padding:6px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.4); color:#fff; font-weight:700; text-align:center;">
-                    ${completedPrizes[prize.id] ? '<span style="color:var(--teal); font-size:0.8rem; font-weight:700;">✅ Đã trao</span>' : ''}
+                    ${completedPrizes[prize.id] ? `<span style="color:var(--teal); font-size:0.8rem; font-weight:700;">✅ Đã trao</span> <button type="button" class="btn btn-sm btn-outline reset-single-prize-btn" data-prize-id="${prize.id}" title="Hủy kết quả giải này để quay lại" style="padding:2px 8px; font-size:0.75rem; border-color:rgba(255,255,255,0.3);">↺ Quay lại</button>` : ''}
                     <div class="reorder-btns" style="margin-left:auto;">
                         <button type="button" class="btn-arrow btn-race-prize-up" ${idx === 0 ? 'disabled' : ''}>▲</button>
                         <button type="button" class="btn-arrow btn-race-prize-down" ${idx === racePrizesConfig.length - 1 ? 'disabled' : ''}>▼</button>
@@ -1566,6 +1583,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
         `).join('');
+
+        // Reset single prize
+        listEl.querySelectorAll('.reset-single-prize-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const prizeId = btn.getAttribute('data-prize-id');
+                const prizeObj = racePrizesConfig.find(p => p.id === prizeId);
+                if (confirm(`Hủy kết quả đã quay của giải "${prizeObj ? prizeObj.name : ''}" để quay lại?`)) {
+                    delete completedPrizes[prizeId];
+                    if (prizeObj) {
+                        raceWinnersHistory = raceWinnersHistory.filter(w => w.prizeId !== prizeId && w.prize !== prizeObj.name);
+                    }
+                    setStoredData('dnt_completed_prizes_2026', completedPrizes);
+                    setStoredData('dnt_race_winners_2026', raceWinnersHistory);
+                    await pushCloudData();
+                    renderRacePrizesConfigList();
+                    renderPublicRaceLeaderboard();
+                    alert(`Đã mở lại giải "${prizeObj ? prizeObj.name : ''}" thành công! Bạn có thể vào Trình Chiếu để quay lại giải này.`);
+                }
+            });
+        });
 
         // Remove prize
         listEl.querySelectorAll('.remove-race-prize-btn').forEach(btn => {
