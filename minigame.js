@@ -552,10 +552,16 @@ document.addEventListener('DOMContentLoaded', () => {
         return deck;
     }
 
+    function closePresentationStage() {
+        presentationOverlay?.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
     function openPresentationStage() {
         slideDeck = buildPresentationDeck();
         currentSlideIndex = 0;
         presentationOverlay?.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
         renderCurrentHeroSlide();
         playSound('win');
     }
@@ -569,13 +575,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     stageCloseBtn?.addEventListener('click', (e) => {
         e.preventDefault();
-        presentationOverlay?.classList.add('hidden');
+        closePresentationStage();
     });
 
     const stageCloseBtnBottomLeft = document.getElementById('stageCloseBtnBottomLeft');
     stageCloseBtnBottomLeft?.addEventListener('click', (e) => {
         e.preventDefault();
-        presentationOverlay?.classList.add('hidden');
+        closePresentationStage();
     });
 
     stageNextSlideBtn?.addEventListener('click', (e) => {
@@ -585,7 +591,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderCurrentHeroSlide();
         } else {
             alert('🎉 Đã trình chiếu hoàn tất tất cả các slide Lễ Trao Giải!');
-            presentationOverlay?.classList.add('hidden');
+            closePresentationStage();
         }
     });
 
@@ -721,7 +727,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         renderCurrentHeroSlide();
                     } else {
                         alert('🎉 Đã trình chiếu xong toàn bộ Lễ Trao Giải!');
-                        presentationOverlay?.classList.add('hidden');
+                        closePresentationStage();
                     }
                 });
             }, 100);
@@ -744,7 +750,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('slideGrandFinishBtn')?.addEventListener('click', (e) => {
                     e.preventDefault();
                     alert('🎉 Chúc mừng Donafest 2026 đã diễn ra thành công rực rỡ!');
-                    presentationOverlay?.classList.add('hidden');
+                    closePresentationStage();
                 });
             }, 100);
 
