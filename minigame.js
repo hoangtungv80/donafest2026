@@ -514,15 +514,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // SECTION 3: DNT LUCKY RACE (11 Slides)
         const raceSlidesDef = [
-            { type: 'run', prizeKey: 'consolation', title: '🏎️ ĐUA GIẢI KHUYẾN KHÍCH (5 XE THẮNG)' },
+            { type: 'run', prizeKey: 'consolation', title: '🏎️ ĐUA GIẢI KHUYẾN KHÍCH' },
             { type: 'win', prizeKey: 'consolation', title: '🎁 VINH DANH CÁC XE THẮNG GIẢI KHUYẾN KHÍCH' },
-            { type: 'run', prizeKey: 'third', title: '🏎️ ĐUA GIẢI BA (3 XE THẮNG)' },
+            { type: 'run', prizeKey: 'third', title: '🏎️ ĐUA GIẢI BA' },
             { type: 'win', prizeKey: 'third', title: '🥉 VINH DANH CÁC XE THẮNG GIẢI BA' },
-            { type: 'run', prizeKey: 'second', title: '🏎️ ĐUA GIẢI NHÌ (2 XE THẮNG)' },
+            { type: 'run', prizeKey: 'second', title: '🏎️ ĐUA GIẢI NHÌ' },
             { type: 'win', prizeKey: 'second', title: '🥈 VINH DANH CÁC XE THẮNG GIẢI NHÌ' },
-            { type: 'run', prizeKey: 'first', title: '🏎️ ĐUA GIẢI NHẤT (1 XE THẮNG)' },
+            { type: 'run', prizeKey: 'first', title: '🏎️ ĐUA GIẢI NHẤT' },
             { type: 'win', prizeKey: 'first', title: '🥇 VINH DANH XE THẮNG GIẢI NHẤT' },
-            { type: 'run', prizeKey: 'special', title: '🏎️ ĐUA GIẢI ĐẶC BIỆT (1 XE THẮNG)' },
+            { type: 'run', prizeKey: 'special', title: '🏎️ ĐUA GIẢI ĐẶC BIỆT' },
             { type: 'win', prizeKey: 'special', title: '🏆 VINH DANH XE THẮNG GIẢI ĐẶC BIỆT' },
             { type: 'grand_summary', title: '👑 BẢNG VÀNG TỔNG HỢP DNT LUCKY RACE 2026' }
         ];
@@ -639,7 +639,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <div class="stage-race-controls">
                         <div class="current-prize-indicator-badge" id="stagePrizeBadge">
-                            ${isFinished ? `✅ ĐÃ TRAO GIẢI: ${prizeObj.name.toUpperCase()}` : `🏆 ĐANG QUAY: ${prizeObj.name.toUpperCase()} (${quota} XE THẮNG)`}
+                            ${isFinished ? `✅ ĐÃ TRAO GIẢI: ${prizeObj.name.toUpperCase()}` : `🏆 ĐANG QUAY: ${prizeObj.name.toUpperCase()}`}
                         </div>
                         <button type="button" id="stageRaceStartBtn" class="btn btn-primary btn-lg btn-glow">
                             <span>${isFinished ? `⏩ XEM VINH DANH (${prizeObj.name})` : `🏎️ BẮT ĐẦU ĐUA (${prizeObj.name.toUpperCase()})`}</span>
