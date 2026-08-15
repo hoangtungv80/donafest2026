@@ -20,8 +20,8 @@
             <h2 class="lock-title">DONAFEST 2026 ARENA</h2>
             <p class="lock-sub">Nhập mã truy cập để vào Cổng Bình Chọn & DNT Lucky Race</p>
             <div class="lock-input-group">
-                <input type="password" id="portalPassInput" placeholder="Mã truy cập..." autocomplete="off">
-                <button type="button" id="portalPassBtn" class="btn btn-primary btn-glow">TRUY CẬP</button>
+                <input type="password" id="portalPassInput" placeholder="Mã truy cập..." autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();window.unlockPortalPasscode();}">
+                <button type="button" id="portalPassBtn" class="btn btn-primary btn-glow" onclick="window.unlockPortalPasscode()">TRUY CẬP</button>
             </div>
         </div>
     </div>

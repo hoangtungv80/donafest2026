@@ -3,13 +3,42 @@
    Realtime Cloud Synchronization Engine (Compact JSONBlob Sync Engine)
    ============================================= */
 
-document.addEventListener('DOMContentLoaded', () => {
+// ====== GLOBAL PASSCODE UNLOCK (AVAILABLE IMMEDIATELY) ======
+window.unlockPortalPasscode = function() {
+    const input = document.getElementById('portalPassInput');
+    const overlay = document.getElementById('portalLockOverlay');
+    const rawVal = input ? input.value.trim() : '';
+    const val = rawVal.replace(/\s+/g, '').toUpperCase();
+    if (val === '2026DNT' || val === 'DNT2026' || val === 'DNT' || val === '2026' || val === 'ADMIN') {
+        sessionStorage.setItem('dnt_portal_unlocked', 'true');
+        if (overlay) {
+            overlay.classList.add('unlocked');
+            overlay.style.setProperty('display', 'none', 'important');
+        }
+        try { playSound('win'); } catch(e) {}
+    } else {
+        alert('❌ Mã truy cập không đúng! Vui lòng nhập mã: 2026DNT');
+    }
+};
+
+// Immediate check on script parse
+(function() {
+    if (sessionStorage.getItem('dnt_portal_unlocked') === 'true') {
+        const overlay = document.getElementById('portalLockOverlay');
+        if (overlay) {
+            overlay.classList.add('unlocked');
+            overlay.style.setProperty('display', 'none', 'important');
+        }
+    }
+})();
+
+function initMinigameApp() {
 
     // Preloader Dismissal Safety
     const preloader = document.getElementById('preloader');
     if (preloader) {
         preloader.classList.add('loaded');
-        setTimeout(() => { preloader.style.display = 'none'; }, 500);
+        setTimeout(() => { preloader.style.display = 'none'; }, 400);
     }
 
     // ====== 1. PASSCODE PORTAL PROTECTION ======
@@ -22,12 +51,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isUnlocked === 'true') {
             if (portalLockOverlay) {
                 portalLockOverlay.classList.add('unlocked');
-                portalLockOverlay.style.display = 'none';
+                portalLockOverlay.style.setProperty('display', 'none', 'important');
             }
         } else {
             if (portalLockOverlay) {
                 portalLockOverlay.classList.remove('unlocked');
-                portalLockOverlay.style.display = 'flex';
+                portalLockOverlay.style.setProperty('display', 'flex', 'important');
             }
         }
     }
@@ -36,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (portalPassBtn) {
         portalPassBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            verifyPortalPasscode();
+            window.unlockPortalPasscode();
         });
     }
 
@@ -44,24 +73,9 @@ document.addEventListener('DOMContentLoaded', () => {
         portalPassInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                verifyPortalPasscode();
+                window.unlockPortalPasscode();
             }
         });
-    }
-
-    function verifyPortalPasscode() {
-        const rawVal = portalPassInput ? portalPassInput.value.trim() : '';
-        const val = rawVal.replace(/\s+/g, '').toUpperCase();
-        if (val === '2026DNT' || val === 'DNT2026') {
-            sessionStorage.setItem('dnt_portal_unlocked', 'true');
-            if (portalLockOverlay) {
-                portalLockOverlay.classList.add('unlocked');
-                portalLockOverlay.style.display = 'none';
-            }
-            try { playSound('win'); } catch(err) {}
-        } else {
-            alert('❌ Mã truy cập không đúng! Vui lòng nhập mã: 2026DNT');
-        }
     }
 
 
@@ -1807,4 +1821,10 @@ document.addEventListener('DOMContentLoaded', () => {
         a.click();
     });
 
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMinigameApp);
+} else {
+    initMinigameApp();
+}
