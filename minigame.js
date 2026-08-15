@@ -95,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'car-24', name: 'Long Hoàng Huy', model: 'BMW 520i F10', plate: 'DNT-24', team: 'DONATEAM', color: '#3c6382', img: 'images/cars/car-24.jpg', desc: 'BMW 520i F10 sang trọng', votes: {} },
         { id: 'car-25', name: 'Lộc Speed', model: 'Mercedes GLK', plate: 'DNT-25', team: 'DONATEAM', color: '#10ac84', img: 'images/donafest.jpg', desc: 'Mercedes GLK phong cách', votes: {} },
         { id: 'car-26', name: 'Hải Dớ', model: 'BMW 735i', plate: 'DNT-26', team: 'DONATEAM', color: '#546de5', img: 'images/donagala.jpg', desc: 'BMW 735i cá tính', votes: {} },
+        { id: 'car-27', name: 'Hưng', model: 'Vinfast VF3', plate: 'DNT-27', team: 'DONATEAM', color: '#27ae60', img: 'images/donatrip.jpg', desc: 'Vinfast VF3 năng động', votes: {} },
         { id: 'car-29', name: 'Dũng Bều', model: 'Honda City GM6', plate: 'DNT-29', team: 'DONATEAM', color: '#c8d6e5', img: 'images/venue.jpg', desc: 'Honda City GM6 thể thao', votes: {} },
         { id: 'car-30', name: 'Mitto Chen', model: 'Mazda 3 Widebody', plate: 'DNT-30', team: 'DONATEAM', color: '#ee5253', img: 'images/donatrip.jpg', desc: 'Mazda 3 Widebody độc đáo', votes: {} },
         { id: 'car-31', name: 'Trương Tuấn Anh', model: 'BMW G20 2020', plate: 'DNT-31', team: 'DONATEAM', color: '#00d2d3', img: 'images/donagala.jpg', desc: 'BMW G20 2020 phong cách', votes: {} },
