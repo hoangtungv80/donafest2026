@@ -710,7 +710,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
 
                     <div class="stage-canvas-wrapper">
-                        <canvas id="raceCanvas" width="920" height="950"></canvas>
+                        <canvas id="raceCanvas"></canvas>
                     </div>
                 </div>
             `;
@@ -1187,8 +1187,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function initRaceCanvas() {
         const canvas = document.getElementById('raceCanvas');
         if (!canvas) return;
+        const wrapper = canvas.parentElement || document.querySelector('.stage-canvas-wrapper');
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
+
+        // Auto-adapt canvas pixel resolution to the wrapper's rendered dimensions
+        const rect = wrapper ? wrapper.getBoundingClientRect() : null;
+        const wrapperW = (rect && rect.width > 200) ? rect.width : (canvas.clientWidth || 1000);
+        const wrapperH = (rect && rect.height > 150) ? rect.height : Math.max(window.innerHeight - 240, 360);
+
+        canvas.width = Math.round(wrapperW);
+        canvas.height = Math.round(wrapperH);
 
         const totalLanes = carsData.length || 30;
         const laneHeight = canvas.height / totalLanes;
@@ -1208,6 +1217,14 @@ document.addEventListener('DOMContentLoaded', () => {
         drawRaceTrack();
     }
 
+    // Auto-recalculate track size on window resize if stage is open
+    window.addEventListener('resize', () => {
+        const canvas = document.getElementById('raceCanvas');
+        if (canvas && !isRacing) {
+            initRaceCanvas();
+        }
+    });
+
     function drawRaceTrack() {
         const canvas = document.getElementById('raceCanvas');
         if (!canvas) return;
@@ -1218,6 +1235,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const totalLanes = raceCars.length || carsData.length || 30;
         const laneHeight = canvas.height / totalLanes;
+        const carH = Math.max(Math.min(laneHeight * 0.72, 16), 6);
+        const carW = Math.max(carH * 2.2, 16);
+        const fontSize = Math.max(Math.min(laneHeight * 0.65, 12), 7.5);
+        const laneNumFont = Math.max(Math.min(laneHeight * 0.55, 10), 7);
 
         for (let i = 0; i < totalLanes; i++) {
             const y = i * laneHeight;
@@ -1233,45 +1254,51 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.stroke();
 
             ctx.fillStyle = '#6b6893';
-            ctx.font = 'bold 10px Outfit, sans-serif';
-            ctx.fillText(`Làn ${i + 1}`, 6, y + laneHeight / 2 + 4);
+            ctx.font = `bold ${laneNumFont}px Outfit, sans-serif`;
+            ctx.fillText(`Làn ${i + 1}`, 4, y + laneHeight / 2 + laneNumFont * 0.35);
         }
 
+        // Start line
         ctx.strokeStyle = 'rgba(255, 45, 120, 0.6)';
         ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.moveTo(60, 0);
-        ctx.lineTo(60, canvas.height);
+        ctx.moveTo(55, 0);
+        ctx.lineTo(55, canvas.height);
         ctx.stroke();
 
-        const finishX = canvas.width - 70;
-        const checkSize = 10;
+        // Finish line checkered pattern
+        const finishX = canvas.width - 60;
+        const checkSize = Math.max(Math.min(laneHeight / 2, 8), 4);
         for (let y = 0; y < canvas.height; y += checkSize) {
-            for (let x = 0; x < 20; x += checkSize) {
-                ctx.fillStyle = ((x + y) / checkSize) % 2 === 0 ? '#ffffff' : '#000000';
+            for (let x = 0; x < 16; x += checkSize) {
+                ctx.fillStyle = ((Math.floor(x / checkSize) + Math.floor(y / checkSize)) % 2 === 0) ? '#ffffff' : '#000000';
                 ctx.fillRect(finishX + x, y, checkSize, checkSize);
             }
         }
 
+        // Draw cars
         raceCars.forEach(car => {
             ctx.fillStyle = car.color;
             ctx.beginPath();
-            ctx.roundRect(car.x - 15, car.y - 8, 30, 16, 4);
+            ctx.roundRect(car.x - carW / 2, car.y - carH / 2, carW, carH, 2.5);
             ctx.fill();
             ctx.strokeStyle = '#ffffff';
             ctx.lineWidth = 1;
             ctx.stroke();
 
+            // Cockpit
             ctx.fillStyle = '#000';
-            ctx.fillRect(car.x - 2, car.y - 6, 8, 12);
+            ctx.fillRect(car.x - carW * 0.15, car.y - carH * 0.35, carW * 0.3, carH * 0.7);
 
+            // Headlights
             ctx.fillStyle = '#00e5c6';
-            ctx.fillRect(car.x + 13, car.y - 7, 3, 4);
-            ctx.fillRect(car.x + 13, car.y + 3, 3, 4);
+            ctx.fillRect(car.x + carW * 0.35, car.y - carH * 0.45, carW * 0.1, carH * 0.3);
+            ctx.fillRect(car.x + carW * 0.35, car.y + carH * 0.15, carW * 0.1, carH * 0.3);
 
+            // Driver & car name text
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 10px Outfit, sans-serif';
-            ctx.fillText(`${car.name} (${car.model})`, car.x + 20, car.y + 3);
+            ctx.font = `bold ${fontSize}px Outfit, sans-serif`;
+            ctx.fillText(`${car.name} (${car.model})`, car.x + carW / 2 + 5, car.y + fontSize * 0.35);
         });
     }
 
