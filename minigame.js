@@ -141,14 +141,10 @@ document.addEventListener('DOMContentLoaded', () => {
         techguy: false
     });
 
-    let prizeQuotas = getStoredData('dnt_prize_quotas', {
-        special: 1,
-        first: 1,
-        second: 2,
-        third: 3,
-        consolation: 5
-    });
-
+    let raceWinnersHistory = getStoredData('dnt_race_winners_2026', []);
+    let completedPrizes = getStoredData('dnt_completed_prizes_2026', {});
+    let prizeQuotas = getStoredData('dnt_prize_quotas', { special: 1, first: 1, second: 2, third: 3, consolation: 5 });
+    let raceDurationSec = getStoredData('dnt_race_duration_sec', 5);
     let racePrizesOrder = getStoredData('dnt_race_prizes_order', [
         { id: 'consolation', name: '🎁 GIẢI KHUYẾN KHÍCH', key: 'consolation' },
         { id: 'third', name: '🥉 GIẢI BA', key: 'third' },
@@ -442,7 +438,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                     const avatarImg = carObj.img || 'images/donafest.jpg';
                                     return `
                                         <div class="panel-winner-item">
-                                            <img src="${avatarImg}" alt="${w.name}" class="panel-winner-avatar" onerror="this.src='images/donafest.jpg'">
                                             <div class="panel-winner-info">
                                                 <div class="panel-winner-name">🏆 ${w.name}</div>
                                                 <div class="panel-winner-model">🏎️ ${w.model}</div>
@@ -697,17 +692,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <div class="hero-winners-list-grid">
                         ${prizeWinners.length > 0 ? prizeWinners.map(w => {
-                            const carObj = carsData.find(c => c.id === w.carId || c.name === w.name) || {};
-                            const imgPath = carObj.img || 'images/donafest.jpg';
-
                             return `
                                 <div class="glass-card" style="padding:16px; text-align:center; border:2px solid var(--teal); background:rgba(12,11,26,0.85);">
-                                    <div style="width:100%; height:160px; border-radius:10px; overflow:hidden; margin-bottom:12px;">
-                                        <img src="${imgPath}" alt="${w.name}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='images/donafest.jpg'">
-                                    </div>
-                                    <div style="font-weight:800; color:#fff; font-size:1.1rem;">${w.name}</div>
-                                    <div style="font-size:0.9rem; color:var(--teal); font-weight:700; margin:2px 0;">🏎️ ${w.model}</div>
-                                    <div style="font-size:0.8rem; color:var(--text-secondary);">🏷️ Mã số: ${w.plate}</div>
+                                    <div style="font-weight:800; color:#fff; font-size:1.25rem; margin-bottom:6px;">🏆 ${w.name}</div>
+                                    <div style="font-size:1.05rem; color:var(--teal); font-weight:700; margin:4px 0;">🏎️ ${w.model}</div>
+                                    <div style="font-size:0.9rem; color:var(--gold); font-weight:700;">🏷️ Mã số: ${w.plate}</div>
                                 </div>
                             `;
                         }).join('') : `<p style="font-size:1.1rem; color:var(--text-muted); padding:30px;">Giải thưởng này chưa diễn ra cuộc đua.</p>`}
@@ -1135,14 +1124,21 @@ document.addEventListener('DOMContentLoaded', () => {
     function initRaceCanvas() {
         const canvas = document.getElementById('raceCanvas');
         if (!canvas) return;
+        const wrapper = canvas.parentElement;
+        if (wrapper) {
+            canvas.width = wrapper.clientWidth || 920;
+            canvas.height = wrapper.clientHeight || Math.max(500, window.innerHeight - 200);
+        }
+
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        const laneHeight = canvas.height / 25;
+        const totalCars = carsData.length || 30;
+        const laneHeight = canvas.height / totalCars;
 
         raceCars = carsData.map((car, index) => ({
             ...car,
-            x: 50,
+            x: 45,
             y: index * laneHeight + laneHeight / 2,
             speed: 0,
             color: car.color || '#ff2d78',
@@ -1163,9 +1159,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        const laneHeight = canvas.height / 25;
+        const totalCars = raceCars.length || 30;
+        const laneHeight = canvas.height / totalCars;
+        const fontSize = Math.max(8, Math.min(11, laneHeight * 0.45));
+        const carH = Math.max(8, Math.min(16, laneHeight * 0.65));
 
-        for (let i = 0; i < 25; i++) {
+        for (let i = 0; i < totalCars; i++) {
             const y = i * laneHeight;
 
             ctx.fillStyle = (i % 2 === 0) ? '#0d0c1d' : '#121126';
@@ -1179,21 +1178,21 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.stroke();
 
             ctx.fillStyle = '#6b6893';
-            ctx.font = 'bold 11px Outfit, sans-serif';
-            ctx.fillText(`Làn ${i + 1}`, 6, y + laneHeight / 2 + 4);
+            ctx.font = `bold ${fontSize}px Outfit, sans-serif`;
+            ctx.fillText(`${i + 1}`, 4, y + laneHeight / 2 + fontSize / 3);
         }
 
         ctx.strokeStyle = 'rgba(255, 45, 120, 0.6)';
         ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.moveTo(60, 0);
-        ctx.lineTo(60, canvas.height);
+        ctx.moveTo(35, 0);
+        ctx.lineTo(35, canvas.height);
         ctx.stroke();
 
-        const finishX = canvas.width - 70;
-        const checkSize = 10;
+        const finishX = canvas.width - 60;
+        const checkSize = Math.max(6, Math.min(10, laneHeight / 2));
         for (let y = 0; y < canvas.height; y += checkSize) {
-            for (let x = 0; x < 20; x += checkSize) {
+            for (let x = 0; x < 15; x += checkSize) {
                 ctx.fillStyle = ((x + y) / checkSize) % 2 === 0 ? '#ffffff' : '#000000';
                 ctx.fillRect(finishX + x, y, checkSize, checkSize);
             }
@@ -1202,22 +1201,19 @@ document.addEventListener('DOMContentLoaded', () => {
         raceCars.forEach(car => {
             ctx.fillStyle = car.color;
             ctx.beginPath();
-            ctx.roundRect(car.x - 15, car.y - 8, 30, 16, 4);
+            ctx.roundRect(car.x - 12, car.y - carH / 2, 24, carH, 3);
             ctx.fill();
             ctx.strokeStyle = '#ffffff';
             ctx.lineWidth = 1;
             ctx.stroke();
 
-            ctx.fillStyle = '#000';
-            ctx.fillRect(car.x - 2, car.y - 6, 8, 12);
-
             ctx.fillStyle = '#00e5c6';
-            ctx.fillRect(car.x + 13, car.y - 7, 3, 4);
-            ctx.fillRect(car.x + 13, car.y + 3, 3, 4);
+            ctx.fillRect(car.x + 10, car.y - carH / 2 + 1, 2, Math.max(2, carH * 0.3));
+            ctx.fillRect(car.x + 10, car.y + carH / 2 - Math.max(2, carH * 0.3) - 1, 2, Math.max(2, carH * 0.3));
 
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 10px Outfit, sans-serif';
-            ctx.fillText(`${car.name} (${car.model})`, car.x + 20, car.y + 3);
+            ctx.font = `bold ${fontSize}px Outfit, sans-serif`;
+            ctx.fillText(`${car.name} (${car.model})`, car.x + 16, car.y + fontSize / 3);
         });
     }
 
@@ -1237,8 +1233,8 @@ document.addEventListener('DOMContentLoaded', () => {
         initRaceCanvas();
 
         const canvas = document.getElementById('raceCanvas');
-        const finishX = (canvas ? canvas.width : 920) - 70;
-        const totalDistance = finishX - 50;
+        const finishX = (canvas ? canvas.width : 920) - 60;
+        const totalDistance = finishX - 45;
 
         const N = prizeInfo.quota;
 
@@ -1250,20 +1246,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const shuffled = [...pool].sort(() => Math.random() - 0.5);
         selectedWinnersForCurrentRace = shuffled.slice(0, N);
 
+        const durationMs = (raceDurationSec || 5) * 1000;
+        const totalFrames = (durationMs / 1000) * 60;
+
         raceCars.forEach(car => {
             const isTargetWinner = selectedWinnersForCurrentRace.some(w => w.id === car.id);
             if (isTargetWinner) {
-                car.targetSpeed = (totalDistance / 300) * (1.1 + Math.random() * 0.15);
+                car.targetSpeed = (totalDistance / totalFrames) * (1.08 + Math.random() * 0.12);
             } else {
-                const frac = 0.65 + Math.random() * 0.27;
-                car.targetSpeed = (totalDistance / 300) * frac;
+                const frac = 0.65 + Math.random() * 0.28;
+                car.targetSpeed = (totalDistance / totalFrames) * frac;
             }
         });
 
         const startBtn = document.getElementById('stageRaceStartBtn');
         if (startBtn) {
             startBtn.disabled = true;
-            startBtn.innerHTML = `<span>🏎️ ĐANG ĐUA... (RACING)</span>`;
+            startBtn.innerHTML = `<span>🏎️ ĐANG ĐUA... (RACING ${raceDurationSec}s)</span>`;
         }
 
         isRacing = true;
@@ -1277,12 +1276,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isRacing) return;
 
         const canvas = document.getElementById('raceCanvas');
-        const finishX = (canvas ? canvas.width : 920) - 70;
+        const finishX = (canvas ? canvas.width : 920) - 60;
 
         const now = Date.now();
         const elapsed = now - raceStartTime;
+        const durationMs = (raceDurationSec || 5) * 1000;
 
-        if (elapsed >= 5000) {
+        if (elapsed >= durationMs) {
             raceCars.forEach(car => {
                 const isWinner = selectedWinnersForCurrentRace.some(w => w.id === car.id);
                 if (isWinner) car.x = finishX;
@@ -1328,16 +1328,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         setStoredData('dnt_race_winners_2026', raceWinnersHistory);
 
-        // Push real-time race results to Cloud DB
         await pushCloudData();
         renderPublicRaceLeaderboard();
 
+        // AUTO-ADVANCE SLIDE TO WINNERS SHOWCASE AFTER 1.5 SECONDS
         setTimeout(() => {
             if (currentSlideIndex < slideDeck.length - 1) {
                 currentSlideIndex++;
                 renderCurrentHeroSlide();
             }
-        }, 600);
+        }, 1500);
     }
 
 
@@ -1449,7 +1449,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // SAVE PRIZE QUOTA BUTTON HANDLER
+    // SAVE PRIZE QUOTA & RACE DURATION BUTTON HANDLER
     const savePrizeQuotaBtn = document.getElementById('savePrizeQuotaBtn');
     if (savePrizeQuotaBtn) {
         if (document.getElementById('quotaSpecial')) document.getElementById('quotaSpecial').value = prizeQuotas.special || 1;
@@ -1457,6 +1457,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (document.getElementById('quotaSecond')) document.getElementById('quotaSecond').value = prizeQuotas.second || 2;
         if (document.getElementById('quotaThird')) document.getElementById('quotaThird').value = prizeQuotas.third || 3;
         if (document.getElementById('quotaConsolation')) document.getElementById('quotaConsolation').value = prizeQuotas.consolation || 5;
+        if (document.getElementById('raceDurationSec')) document.getElementById('raceDurationSec').value = raceDurationSec || 5;
 
         savePrizeQuotaBtn.addEventListener('click', async (e) => {
             e.preventDefault();
@@ -1468,9 +1469,14 @@ document.addEventListener('DOMContentLoaded', () => {
             prizeQuotas.third = parseInt(document.getElementById('quotaThird').value) || 3;
             prizeQuotas.consolation = parseInt(document.getElementById('quotaConsolation').value) || 5;
 
+            raceDurationSec = parseInt(document.getElementById('raceDurationSec').value) || 5;
+            if (raceDurationSec < 3) raceDurationSec = 3;
+            if (raceDurationSec > 60) raceDurationSec = 60;
+            setStoredData('dnt_race_duration_sec', raceDurationSec);
+
             setStoredData('dnt_prize_quotas', prizeQuotas);
             await pushCloudData();
-            alert('💾 Đã lưu cấu hình số lượng giải thưởng thành công!');
+            alert('💾 Đã lưu cấu hình cuộc đua & số lượng giải thưởng thành công!');
         });
     }
 
