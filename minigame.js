@@ -99,6 +99,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'car-29', name: 'Dũng Bều', model: 'Honda City GM6', plate: 'DNT-29', team: 'DONATEAM', color: '#c8d6e5', img: 'images/venue.jpg', desc: 'Honda City GM6 thể thao', votes: {} },
         { id: 'car-30', name: 'Mitto Chen', model: 'Mazda 3 Widebody', plate: 'DNT-30', team: 'DONATEAM', color: '#ee5253', img: 'images/donatrip.jpg', desc: 'Mazda 3 Widebody độc đáo', votes: {} },
         { id: 'car-31', name: 'Trương Tuấn Anh', model: 'BMW G20 2020', plate: 'DNT-31', team: 'DONATEAM', color: '#00d2d3', img: 'images/donagala.jpg', desc: 'BMW G20 2020 phong cách', votes: {} },
+        { id: 'car-32', name: 'Lê Anh Tuấn', model: 'Honda Civic Gen8', plate: 'DNT-32', team: 'DONATEAM', color: '#e17055', img: 'images/venue.jpg', desc: 'Honda Civic Gen8 cá tính', votes: {} },
+        { id: 'car-33', name: 'Linh Vũ', model: 'Honda City GM6', plate: 'DNT-33', team: 'DONATEAM', color: '#a29bfe', img: 'images/donafest.jpg', desc: 'Honda City GM6 năng động', votes: {} },
         { id: 'car-00', name: 'Trần Ngọc Hiếu', model: 'Vinfast MPV 7', plate: 'DNT-00', team: 'DONATEAM', color: '#10ac84', img: 'images/donafest.jpg', desc: 'Vinfast MPV 7 ấn tượng', votes: {} }
     ];
     const OFFICIAL_25_CARS = OFFICIAL_30_CARS;
