@@ -5,6 +5,13 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    // Preloader Dismissal Safety
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+        preloader.classList.add('loaded');
+        setTimeout(() => { preloader.style.display = 'none'; }, 500);
+    }
+
     // ====== 1. PASSCODE PORTAL PROTECTION ======
     const portalLockOverlay = document.getElementById('portalLockOverlay');
     const portalPassInput = document.getElementById('portalPassInput');
@@ -44,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function verifyPortalPasscode() {
         const rawVal = portalPassInput ? portalPassInput.value.trim() : '';
-        const val = rawVal.replaceAll(' ', '').toUpperCase();
+        const val = rawVal.replace(/\s+/g, '').toUpperCase();
         if (val === '2026DNT' || val === 'DNT2026') {
             sessionStorage.setItem('dnt_portal_unlocked', 'true');
             if (portalLockOverlay) {
