@@ -1438,7 +1438,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ====== DYNAMIC RACE PRIZES CONFIG RENDERER ======
     function renderRacePrizesConfigList() {
-        const listEl = document.getElementById('racePrizesOrderList');
+        const listEl = document.getElementById('racePrizesConfigList');
         if (!listEl) return;
 
         if (racePrizesConfig.length === 0) {
@@ -1515,7 +1515,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('saveRacePrizesBtn')?.addEventListener('click', async (e) => {
         e.preventDefault();
         // Collect latest values from inputs
-        const listEl = document.getElementById('racePrizesOrderList');
+        const listEl = document.getElementById('racePrizesConfigList');
         if (listEl) {
             listEl.querySelectorAll('.race-prize-config-row').forEach(row => {
                 const prizeId = row.getAttribute('data-prize-id');
