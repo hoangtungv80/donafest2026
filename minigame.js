@@ -145,24 +145,35 @@ document.addEventListener('DOMContentLoaded', () => {
         techguy: false
     });
 
-    let prizeQuotas = getStoredData('dnt_prize_quotas', {
-        special: 1,
-        first: 1,
-        second: 2,
-        third: 3,
-        consolation: 5
-    });
+    const DEFAULT_RACE_PRIZES = [
+        { id: 'prize-consolation', name: '🎁 GIẢI KHUYẾN KHÍCH', quota: 5 },
+        { id: 'prize-third',       name: '🥉 GIẢI BA',           quota: 3 },
+        { id: 'prize-second',      name: '🥈 GIẢI NHÌ',          quota: 2 },
+        { id: 'prize-first',       name: '🥇 GIẢI NHẤT',         quota: 1 },
+        { id: 'prize-special',     name: '🏆 GIẢI ĐẶC BIỆT',     quota: 1 }
+    ];
 
-    let racePrizesOrder = getStoredData('dnt_race_prizes_order', [
-        { id: 'consolation', name: '🎁 GIẢI KHUYẾN KHÍCH', key: 'consolation' },
-        { id: 'third', name: '🥉 GIẢI BA', key: 'third' },
-        { id: 'second', name: '🥈 GIẢI NHÌ', key: 'second' },
-        { id: 'first', name: '🥇 GIẢI NHẤT', key: 'first' },
-        { id: 'special', name: '🏆 GIẢI ĐẶC BIỆT', key: 'special' }
-    ]);
+    // Auto-migrate from old two-variable system if needed
+    (function migrateRacePrizes() {
+        const stored = localStorage.getItem('dnt_race_prizes_config');
+        if (!stored) {
+            // Try to migrate from legacy dnt_race_prizes_order + dnt_prize_quotas
+            const oldOrder = getStoredData('dnt_race_prizes_order', null);
+            const oldQuotas = getStoredData('dnt_prize_quotas', null);
+            if (oldOrder && oldQuotas) {
+                const migrated = oldOrder.map(p => ({
+                    id: 'prize-' + p.key,
+                    name: p.name,
+                    quota: oldQuotas[p.key] || 1
+                }));
+                localStorage.setItem('dnt_race_prizes_config', JSON.stringify(migrated));
+            }
+        }
+    })();
 
+    let racePrizesConfig = getStoredData('dnt_race_prizes_config', DEFAULT_RACE_PRIZES);
     let completedPrizes = getStoredData('dnt_completed_prizes_2026', {});
-    let currentRacePrizeKey = 'consolation';
+    let currentRacePrizeId = racePrizesConfig.length > 0 ? racePrizesConfig[0].id : null;
 
     let presentationOrder = getStoredData('dnt_presentation_order', [
         { id: 'voting', name: '🏆 Cổng Bình Chọn (12 Hạng Mục)' },
@@ -264,6 +275,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 completedPrizes = cloudData.completed || {};
                 setStoredData('dnt_completed_prizes_2026', completedPrizes);
             }
+            if (cloudData.racePrizesConfig !== undefined && Array.isArray(cloudData.racePrizesConfig)) {
+                racePrizesConfig = cloudData.racePrizesConfig;
+                setStoredData('dnt_race_prizes_config', racePrizesConfig);
+            }
 
             renderVotingSection();
             renderPublicLeaderboard();
@@ -292,7 +307,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 toggles: leaderboardToggles,
                 awardsConfig: awardsConfig,
                 winners: raceWinnersHistory,
-                completed: completedPrizes
+                completed: completedPrizes,
+                racePrizesConfig: racePrizesConfig
             });
         } catch(e) {
             console.log('Firebase config push error:', e.message);
@@ -406,7 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let slideDeck = [];
     let currentSlideIndex = 0;
 
-    // Helper: Generate 5-Panel Grand Showcase HTML
+    // Helper: Generate dynamic panels Grand Showcase HTML (one panel per prize)
     function render5PanelsRaceShowcase(history) {
         if (!history || history.length === 0) {
             return `
@@ -418,26 +434,25 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         }
 
-        const prizePanels = [
-            { key: 'special', title: '🏆 GIẢI ĐẶC BIỆT', cls: 'special' },
-            { key: 'first', title: '🥇 GIẢI NHẤT', cls: 'first' },
-            { key: 'second', title: '🥈 GIẢI NHÌ', cls: 'second' },
-            { key: 'third', title: '🥉 GIẢI BA', cls: 'third' },
-            { key: 'consolation', title: '🎁 GIẢI KHUYẾN KHÍCH', cls: 'consolation' }
-        ];
+        // Show prizes in reverse order (last prize first = most prestigious on top)
+        const displayPrizes = [...racePrizesConfig].reverse();
 
         return `
             <div class="race-grand-showcase-grid">
-                ${prizePanels.map(panel => {
-                    const prizeObj = racePrizesOrder.find(p => p.key === panel.key);
-                    const titleToMatch = prizeObj ? prizeObj.name : panel.title;
-
-                    const panelWinners = history.filter(w => w.prize.includes(titleToMatch) || w.prize === titleToMatch);
+                ${displayPrizes.map(prize => {
+                    const panelWinners = history.filter(w =>
+                        w.prizeId === prize.id || w.prize === prize.name
+                    );
+                    const panelCls = prize.name.includes('ĐẶC BIỆT') ? 'special'
+                        : prize.name.includes('NHẤT') ? 'first'
+                        : prize.name.includes('NHÌ') ? 'second'
+                        : prize.name.includes('BA') ? 'third'
+                        : 'consolation';
 
                     return `
-                        <div class="prize-panel-card ${panel.cls}">
+                        <div class="prize-panel-card ${panelCls}">
                             <div class="prize-panel-header">
-                                <span>${panel.title}</span>
+                                <span>${prize.name}</span>
                                 <span class="prize-count-pill" style="font-size:0.8rem; opacity:0.8;">(${panelWinners.length} XE)</span>
                             </div>
                             <div class="panel-winners-list">
@@ -522,35 +537,47 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // SECTION 3: DNT LUCKY RACE (11 Slides)
-        const raceSlidesDef = [
-            { type: 'run', prizeKey: 'consolation', title: '🏎️ ĐUA GIẢI KHUYẾN KHÍCH' },
-            { type: 'win', prizeKey: 'consolation', title: '🎁 VINH DANH CÁC XE THẮNG GIẢI KHUYẾN KHÍCH' },
-            { type: 'run', prizeKey: 'third', title: '🏎️ ĐUA GIẢI BA' },
-            { type: 'win', prizeKey: 'third', title: '🥉 VINH DANH CÁC XE THẮNG GIẢI BA' },
-            { type: 'run', prizeKey: 'second', title: '🏎️ ĐUA GIẢI NHÌ' },
-            { type: 'win', prizeKey: 'second', title: '🥈 VINH DANH CÁC XE THẮNG GIẢI NHÌ' },
-            { type: 'run', prizeKey: 'first', title: '🏎️ ĐUA GIẢI NHẤT' },
-            { type: 'win', prizeKey: 'first', title: '🥇 VINH DANH XE THẮNG GIẢI NHẤT' },
-            { type: 'run', prizeKey: 'special', title: '🏎️ ĐUA GIẢI ĐẶC BIỆT' },
-            { type: 'win', prizeKey: 'special', title: '🏆 VINH DANH XE THẮNG GIẢI ĐẶC BIỆT' },
-            { type: 'grand_summary', title: '👑 BẢNG VÀNG TỔNG HỢP DNT LUCKY RACE 2026' }
-        ];
+        // SECTION 3: DNT LUCKY RACE (Dynamic — 2 slides per prize + 1 summary)
+        const totalRaceSlides = racePrizesConfig.length * 2 + 1;
+        let rIdx = 0;
 
-        raceSlidesDef.forEach((def, rIdx) => {
+        racePrizesConfig.forEach(prize => {
+            // Slide A: Race run
             deck.push({
                 sectionIndex: 2,
                 sectionId: 'race',
                 sectionName: 'Phần 3/3: 🏎️ DNT LUCKY RACE',
-                slideInSecIndex: rIdx,
-                slidesInSecTotal: 11,
-                slideTitle: def.title,
-                isRaceSlide: def.type === 'run',
-                isRaceWinnerSlide: def.type === 'win',
-                isRaceGrandSummarySlide: def.type === 'grand_summary',
-                prizeKey: def.prizeKey,
+                slideInSecIndex: rIdx++,
+                slidesInSecTotal: totalRaceSlides,
+                slideTitle: `🏎️ ĐUA ${prize.name.toUpperCase()}`,
+                isRaceSlide: true,
+                prizeId: prize.id,
                 winnerImg: 'images/venue.jpg'
             });
+            // Slide B: Winner reveal
+            deck.push({
+                sectionIndex: 2,
+                sectionId: 'race',
+                sectionName: 'Phần 3/3: 🏎️ DNT LUCKY RACE',
+                slideInSecIndex: rIdx++,
+                slidesInSecTotal: totalRaceSlides,
+                slideTitle: `🏆 VINH DANH CÁC XE THẮNG ${prize.name.toUpperCase()}`,
+                isRaceWinnerSlide: true,
+                prizeId: prize.id,
+                winnerImg: 'images/venue.jpg'
+            });
+        });
+
+        // Grand summary slide
+        deck.push({
+            sectionIndex: 2,
+            sectionId: 'race',
+            sectionName: 'Phần 3/3: 🏎️ DNT LUCKY RACE',
+            slideInSecIndex: rIdx,
+            slidesInSecTotal: totalRaceSlides,
+            slideTitle: '👑 BẢNG VÀNG TỔNG HỢP DNT LUCKY RACE 2026',
+            isRaceGrandSummarySlide: true,
+            winnerImg: 'images/donafest.jpg'
         });
 
         return deck;
@@ -644,10 +671,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (slide.isRaceSlide) {
-            currentRacePrizeKey = slide.prizeKey;
-            const prizeObj = racePrizesOrder.find(p => p.key === currentRacePrizeKey) || racePrizesOrder[0];
-            const quota = prizeQuotas[currentRacePrizeKey] || 1;
-            const isFinished = !!completedPrizes[currentRacePrizeKey];
+            currentRacePrizeId = slide.prizeId;
+            const prizeObj = racePrizesConfig.find(p => p.id === currentRacePrizeId) || racePrizesConfig[0];
+            const isFinished = !!completedPrizes[currentRacePrizeId];
 
             stageSlideContent.innerHTML = `
                 <div class="stage-race-container">
@@ -687,8 +713,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 100);
 
         } else if (slide.isRaceWinnerSlide) {
-            const prizeObj = racePrizesOrder.find(p => p.key === slide.prizeKey) || racePrizesOrder[0];
-            const prizeWinners = raceWinnersHistory.filter(w => w.prize.includes(prizeObj.name) || w.prize === prizeObj.name);
+            const prizeObj = racePrizesConfig.find(p => p.id === slide.prizeId) || racePrizesConfig[0];
+            const prizeWinners = raceWinnersHistory.filter(w =>
+                w.prizeId === slide.prizeId || w.prize === prizeObj.name
+            );
 
             const isNextSlideAvailable = currentSlideIndex < slideDeck.length - 1;
             const nextSlideObj = isNextSlideAvailable ? slideDeck[currentSlideIndex + 1] : null;
@@ -1127,12 +1155,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedWinnersForCurrentRace = [];
 
     function getCurrentPrizeInfo() {
-        const prizeObj = racePrizesOrder.find(p => p.key === currentRacePrizeKey) || racePrizesOrder[0];
-        const count = prizeQuotas[prizeObj.key] || 1;
+        const prizeObj = racePrizesConfig.find(p => p.id === currentRacePrizeId) || racePrizesConfig[0];
         return {
             title: prizeObj.name,
-            key: prizeObj.key,
-            quota: count
+            id: prizeObj.id,
+            quota: prizeObj.quota || 1
         };
     }
 
@@ -1230,7 +1257,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const prizeInfo = getCurrentPrizeInfo();
 
-        if (completedPrizes[prizeInfo.key]) {
+        if (completedPrizes[prizeInfo.id]) {
             if (currentSlideIndex < slideDeck.length - 1) {
                 currentSlideIndex++;
                 renderCurrentHeroSlide();
@@ -1317,12 +1344,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const prizeInfo = getCurrentPrizeInfo();
         const winners = selectedWinnersForCurrentRace;
 
-        completedPrizes[prizeInfo.key] = true;
+        completedPrizes[prizeInfo.id] = true;
         setStoredData('dnt_completed_prizes_2026', completedPrizes);
 
         winners.forEach(w => {
             raceWinnersHistory.unshift({
                 carId: w.id,
+                prizeId: prizeInfo.id,
                 prize: prizeInfo.title,
                 name: w.name,
                 model: w.model,
@@ -1375,7 +1403,7 @@ document.addEventListener('DOMContentLoaded', () => {
             adminPanel?.classList.remove('hidden');
             renderAdminAwardsList();
             renderLeaderboardToggles();
-            renderRacePrizesOrderList();
+            renderRacePrizesConfigList();
             renderCategoriesOrderList();
             renderPresentationOrderList();
         }
@@ -1390,7 +1418,7 @@ document.addEventListener('DOMContentLoaded', () => {
             adminPanel?.classList.remove('hidden');
             renderAdminAwardsList();
             renderLeaderboardToggles();
-            renderRacePrizesOrderList();
+            renderRacePrizesConfigList();
             renderCategoriesOrderList();
             renderPresentationOrderList();
         } else {
@@ -1408,75 +1436,103 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Reorder DNT Lucky Race Prizes Sequence
-    function renderRacePrizesOrderList() {
+    // ====== DYNAMIC RACE PRIZES CONFIG RENDERER ======
+    function renderRacePrizesConfigList() {
         const listEl = document.getElementById('racePrizesOrderList');
         if (!listEl) return;
 
-        listEl.innerHTML = racePrizesOrder.map((prize, idx) => `
-            <div class="reorder-item">
-                <span class="reorder-drag-handle">☰</span>
-                <span class="reorder-title">${idx + 1}. ${prize.name} ${completedPrizes[prize.key] ? '(✅ Đã trao)' : ''}</span>
-                <div class="reorder-btns">
-                    <button type="button" class="btn-arrow btn-prize-up" ${idx === 0 ? 'disabled' : ''}>▲</button>
-                    <button type="button" class="btn-arrow btn-prize-down" ${idx === racePrizesOrder.length - 1 ? 'disabled' : ''}>▼</button>
+        if (racePrizesConfig.length === 0) {
+            listEl.innerHTML = `<p style="color:var(--text-secondary); text-align:center; padding:15px;">Chưa có giải nào. Bấm nút bên dưới để thêm!</p>`;
+            return;
+        }
+
+        listEl.innerHTML = racePrizesConfig.map((prize, idx) => `
+            <div class="race-prize-config-row" data-prize-id="${prize.id}" style="padding:10px; margin-bottom:8px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:10px;">
+                <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
+                    <span style="font-weight:700; color:var(--teal); font-size:0.85rem; min-width:20px;">#${idx + 1}</span>
+                    <input type="text" class="race-prize-name-input" value="${prize.name}" placeholder="Tên giải..." style="flex:1; padding:7px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.4); color:#fff; font-weight:600; font-size:0.88rem;">
+                    <button type="button" class="btn btn-sm btn-danger remove-race-prize-btn" data-prize-id="${prize.id}" style="padding:5px 9px;">🗑️</button>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <span style="font-size:0.82rem; color:var(--text-secondary); white-space:nowrap;">Số xe thắng:</span>
+                    <input type="number" class="race-prize-quota-input" value="${prize.quota}" min="1" max="30" style="width:70px; padding:6px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.4); color:#fff; font-weight:700; text-align:center;">
+                    ${completedPrizes[prize.id] ? '<span style="color:var(--teal); font-size:0.8rem; font-weight:700;">✅ Đã trao</span>' : ''}
+                    <div class="reorder-btns" style="margin-left:auto;">
+                        <button type="button" class="btn-arrow btn-race-prize-up" ${idx === 0 ? 'disabled' : ''}>▲</button>
+                        <button type="button" class="btn-arrow btn-race-prize-down" ${idx === racePrizesConfig.length - 1 ? 'disabled' : ''}>▼</button>
+                    </div>
                 </div>
             </div>
         `).join('');
 
-        listEl.querySelectorAll('.btn-prize-up').forEach((btn, idx) => {
-            btn.addEventListener('click', async (e) => {
+        // Remove prize
+        listEl.querySelectorAll('.remove-race-prize-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const prizeId = btn.getAttribute('data-prize-id');
+                if (confirm('Xóa giải này? Dữ liệu kết quả đua liên quan sẽ không bị xóa.')) {
+                    racePrizesConfig = racePrizesConfig.filter(p => p.id !== prizeId);
+                    renderRacePrizesConfigList();
+                }
+            });
+        });
+
+        // Move up
+        listEl.querySelectorAll('.btn-race-prize-up').forEach((btn, idx) => {
+            btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 if (idx > 0) {
-                    const temp = racePrizesOrder[idx];
-                    racePrizesOrder[idx] = racePrizesOrder[idx - 1];
-                    racePrizesOrder[idx - 1] = temp;
-                    setStoredData('dnt_race_prizes_order', racePrizesOrder);
-                    renderRacePrizesOrderList();
-                    await pushCloudData();
+                    [racePrizesConfig[idx], racePrizesConfig[idx - 1]] = [racePrizesConfig[idx - 1], racePrizesConfig[idx]];
+                    renderRacePrizesConfigList();
                 }
             });
         });
 
-        listEl.querySelectorAll('.btn-prize-down').forEach((btn, idx) => {
-            btn.addEventListener('click', async (e) => {
+        // Move down
+        listEl.querySelectorAll('.btn-race-prize-down').forEach((btn, idx) => {
+            btn.addEventListener('click', (e) => {
                 e.preventDefault();
-                if (idx < racePrizesOrder.length - 1) {
-                    const temp = racePrizesOrder[idx];
-                    racePrizesOrder[idx] = racePrizesOrder[idx + 1];
-                    racePrizesOrder[idx + 1] = temp;
-                    setStoredData('dnt_race_prizes_order', racePrizesOrder);
-                    renderRacePrizesOrderList();
-                    await pushCloudData();
+                if (idx < racePrizesConfig.length - 1) {
+                    [racePrizesConfig[idx], racePrizesConfig[idx + 1]] = [racePrizesConfig[idx + 1], racePrizesConfig[idx]];
+                    renderRacePrizesConfigList();
                 }
             });
         });
     }
 
-    // SAVE PRIZE QUOTA BUTTON HANDLER
-    const savePrizeQuotaBtn = document.getElementById('savePrizeQuotaBtn');
-    if (savePrizeQuotaBtn) {
-        if (document.getElementById('quotaSpecial')) document.getElementById('quotaSpecial').value = prizeQuotas.special || 1;
-        if (document.getElementById('quotaFirst')) document.getElementById('quotaFirst').value = prizeQuotas.first || 1;
-        if (document.getElementById('quotaSecond')) document.getElementById('quotaSecond').value = prizeQuotas.second || 2;
-        if (document.getElementById('quotaThird')) document.getElementById('quotaThird').value = prizeQuotas.third || 3;
-        if (document.getElementById('quotaConsolation')) document.getElementById('quotaConsolation').value = prizeQuotas.consolation || 5;
-
-        savePrizeQuotaBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-
-            prizeQuotas.special = parseInt(document.getElementById('quotaSpecial').value) || 1;
-            prizeQuotas.first = parseInt(document.getElementById('quotaFirst').value) || 1;
-            prizeQuotas.second = parseInt(document.getElementById('quotaSecond').value) || 2;
-            prizeQuotas.third = parseInt(document.getElementById('quotaThird').value) || 3;
-            prizeQuotas.consolation = parseInt(document.getElementById('quotaConsolation').value) || 5;
-
-            setStoredData('dnt_prize_quotas', prizeQuotas);
-            await pushCloudData();
-            alert('💾 Đã lưu cấu hình số lượng giải thưởng thành công!');
+    // Add new prize button
+    document.getElementById('adminAddRacePrizeBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        racePrizesConfig.push({
+            id: 'prize-' + Date.now(),
+            name: `🎁 GIẢI MỚI #${racePrizesConfig.length + 1}`,
+            quota: 1
         });
-    }
+        renderRacePrizesConfigList();
+    });
+
+    // Save prize config button
+    document.getElementById('saveRacePrizesBtn')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        // Collect latest values from inputs
+        const listEl = document.getElementById('racePrizesOrderList');
+        if (listEl) {
+            listEl.querySelectorAll('.race-prize-config-row').forEach(row => {
+                const prizeId = row.getAttribute('data-prize-id');
+                const item = racePrizesConfig.find(p => p.id === prizeId);
+                if (item) {
+                    const nameInput = row.querySelector('.race-prize-name-input');
+                    const quotaInput = row.querySelector('.race-prize-quota-input');
+                    if (nameInput) item.name = nameInput.value.trim() || item.name;
+                    if (quotaInput) item.quota = parseInt(quotaInput.value) || 1;
+                }
+            });
+        }
+        setStoredData('dnt_race_prizes_config', racePrizesConfig);
+        await pushCloudData();
+        renderRacePrizesConfigList();
+        alert('💾 Đã lưu & đồng bộ cấu hình giải DNT Lucky Race thành công!');
+    });
 
     // DYNAMIC AWARDS CONFIG LIST RENDERER & EVENT HANDLERS
     function renderAdminAwardsList() {
@@ -1740,13 +1796,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (confirm('⚠️ Bạn có chắc chắn muốn reset toàn bộ kết quả trao giải DNT Lucky Race?')) {
             raceWinnersHistory = [];
             completedPrizes = {};
-            currentRacePrizeKey = 'consolation';
+            currentRacePrizeId = racePrizesConfig.length > 0 ? racePrizesConfig[0].id : null;
             setStoredData('dnt_race_winners_2026', raceWinnersHistory);
             setStoredData('dnt_completed_prizes_2026', completedPrizes);
             await fbPatch('', { winners: null, completed: null });
             renderPublicRaceLeaderboard();
             renderPublicLeaderboard();
-            renderRacePrizesOrderList();
+            renderRacePrizesConfigList();
             alert('✅ Đã reset đồng bộ Cloud toàn bộ kết quả DNT Lucky Race!');
         }
     });
@@ -1756,11 +1812,9 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const fullBackup = {
             cars: carsData,
-            quotas: prizeQuotas,
-            racePrizesOrder: racePrizesOrder,
+            racePrizesConfig: racePrizesConfig,
             completedPrizes: completedPrizes,
             presentationOrder: presentationOrder,
-            shoutouts: shoutoutData,
             winnersHistory: raceWinnersHistory,
             exportTime: new Date().toISOString()
         };

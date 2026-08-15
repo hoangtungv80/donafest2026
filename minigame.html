@@ -264,37 +264,19 @@
                         </div>
                     </div>
 
-                    <!-- Panel 5: Prize Quotas Config -->
+                    <!-- Panel 5: Dynamic Race Prize Config -->
                     <div class="glass-card">
-                        <h3>🎁 SỐ LƯỢNG GIẢI DNT LUCKY RACE</h3>
-                        <form id="adminPrizeQuotaForm" class="admin-form" onsubmit="return false;">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="quotaSpecial">🏆 Giải Đặc Biệt (Số xe):</label>
-                                    <input type="number" id="quotaSpecial" min="1" max="10" value="1">
-                                </div>
-                                <div class="form-group">
-                                    <label for="quotaFirst">🥇 Giải Nhất (Số xe):</label>
-                                    <input type="number" id="quotaFirst" min="1" max="10" value="1">
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="quotaSecond">🥈 Giải Nhì (Số xe):</label>
-                                    <input type="number" id="quotaSecond" min="1" max="10" value="2">
-                                </div>
-                                <div class="form-group">
-                                    <label for="quotaThird">🥉 Giải Ba (Số xe):</label>
-                                    <input type="number" id="quotaThird" min="1" max="10" value="3">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="quotaConsolation">🎁 Giải Khuyến Khích (Số xe):</label>
-                                <input type="number" id="quotaConsolation" min="1" max="30" value="5">
-                            </div>
-
-                            <button type="button" id="savePrizeQuotaBtn" class="btn btn-primary btn-block">💾 Lưu Cấu Hình Số Lượng Giải</button>
-                        </form>
+                        <h3>🏎️ CẤU HÌNH GIẢI DNT LUCKY RACE</h3>
+                        <p class="card-sub-hint">Thêm/bớt giải, đặt tên & số xe thắng:</p>
+                        <div id="racePrizesOrderList" class="awards-config-list margin-top-10">
+                            <!-- JS Generated -->
+                        </div>
+                        <button type="button" id="adminAddRacePrizeBtn" class="btn btn-outline btn-block margin-top-10">
+                            ➕ Thêm Giải Mới
+                        </button>
+                        <button type="button" id="saveRacePrizesBtn" class="btn btn-primary btn-block margin-top-10">
+                            💾 Lưu & Đồng Bộ Cloud
+                        </button>
                     </div>
 
                     <!-- Panel 6: Dynamic Awards Config -->
