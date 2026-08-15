@@ -69,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ====== 3. OFFICIAL 30 PARTICIPANTS ROSTER ======
     const OFFICIAL_30_CARS = [
-        { id: 'car-00', name: 'Trần Ngọc Hiếu', model: 'Vinfast MPV 7', plate: 'DNT-00', team: 'DONATEAM', color: '#10ac84', img: 'images/donafest.jpg', desc: 'Vinfast MPV 7 ấn tượng', votes: {} },
         { id: 'car-1', name: 'Hoàng Tùng', model: 'BMW 640i F06 2012', plate: 'DNT-01', team: 'DONATEAM', color: '#1e1e1e', img: 'images/cars/car-1.jpg', desc: 'BMW 640i F06 Gran Coupe 2012', votes: {} },
         { id: 'car-2', name: 'Trịnh Quốc Trung', model: 'Honda Civic FE', plate: 'DNT-02', team: 'DONATEAM', color: '#f5f6fa', img: 'images/cars/car-2.jpg', desc: 'Honda Civic FE thể thao', votes: {} },
         { id: 'car-3', name: 'Ngô Quang Nghĩa', model: 'BMW 520i Cát Hải', plate: 'DNT-03', team: 'DONATEAM', color: '#546de5', img: 'images/cars/car-3.jpg', desc: 'BMW 520i Cát Hải sang trọng', votes: {} },
@@ -98,7 +97,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'car-26', name: 'Hải Dớ', model: 'BMW 735i', plate: 'DNT-26', team: 'DONATEAM', color: '#546de5', img: 'images/donagala.jpg', desc: 'BMW 735i cá tính', votes: {} },
         { id: 'car-29', name: 'Dũng Bều', model: 'Honda City GM6', plate: 'DNT-29', team: 'DONATEAM', color: '#c8d6e5', img: 'images/venue.jpg', desc: 'Honda City GM6 thể thao', votes: {} },
         { id: 'car-30', name: 'Mitto Chen', model: 'Mazda 3 Widebody', plate: 'DNT-30', team: 'DONATEAM', color: '#ee5253', img: 'images/donatrip.jpg', desc: 'Mazda 3 Widebody độc đáo', votes: {} },
-        { id: 'car-31', name: 'Trương Tuấn Anh', model: 'BMW G20 2020', plate: 'DNT-31', team: 'DONATEAM', color: '#00d2d3', img: 'images/donagala.jpg', desc: 'BMW G20 2020 phong cách', votes: {} }
+        { id: 'car-31', name: 'Trương Tuấn Anh', model: 'BMW G20 2020', plate: 'DNT-31', team: 'DONATEAM', color: '#00d2d3', img: 'images/donagala.jpg', desc: 'BMW G20 2020 phong cách', votes: {} },
+        { id: 'car-00', name: 'Trần Ngọc Hiếu', model: 'Vinfast MPV 7', plate: 'DNT-00', team: 'DONATEAM', color: '#10ac84', img: 'images/donafest.jpg', desc: 'Vinfast MPV 7 ấn tượng', votes: {} }
     ];
     const OFFICIAL_25_CARS = OFFICIAL_30_CARS;
 
