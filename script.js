@@ -5,18 +5,15 @@
 document.addEventListener('DOMContentLoaded', () => {
     // ====== PRELOADER ======
     const preloader = document.getElementById('preloader');
-    if (preloader) {
-        window.addEventListener('load', () => {
-            setTimeout(() => preloader.classList.add('loaded'), 1600);
-        });
-        setTimeout(() => preloader.classList.add('loaded'), 2500);
-    }
+    window.addEventListener('load', () => {
+        setTimeout(() => preloader.classList.add('loaded'), 1600);
+    });
+    setTimeout(() => preloader.classList.add('loaded'), 2500);
 
     // ====== NAVBAR ======
     const navbar = document.getElementById('navbar');
     const navLinks = document.querySelectorAll('.nav-link[data-section]');
     const sections = document.querySelectorAll('section[id]');
-    if (!navbar) return; // Stop here if not on index.html
 
     function handleNavScroll() {
         if (window.scrollY > 60) {

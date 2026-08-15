@@ -20,8 +20,8 @@
             <h2 class="lock-title">DONAFEST 2026 ARENA</h2>
             <p class="lock-sub">Nhập mã truy cập để vào Cổng Bình Chọn & DNT Lucky Race</p>
             <div class="lock-input-group">
-                <input type="password" id="portalPassInput" placeholder="Mã truy cập..." autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();window.unlockPortalPasscode();}">
-                <button type="button" id="portalPassBtn" class="btn btn-primary btn-glow" onclick="window.unlockPortalPasscode()">TRUY CẬP</button>
+                <input type="password" id="portalPassInput" placeholder="Mã truy cập..." autocomplete="off">
+                <button type="button" id="portalPassBtn" class="btn btn-primary btn-glow">TRUY CẬP</button>
             </div>
         </div>
     </div>
@@ -288,18 +288,12 @@
                                     <input type="number" id="quotaThird" min="1" max="10" value="3">
                                 </div>
                             </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="quotaConsolation">🎁 Giải Khuyến Khích (Số xe):</label>
-                                    <input type="number" id="quotaConsolation" min="1" max="30" value="5">
-                                </div>
-                                <div class="form-group">
-                                    <label for="raceDurationSec">⏱️ Thời Gian Chạy Đua (Giây):</label>
-                                    <input type="number" id="raceDurationSec" min="3" max="60" value="5">
-                                </div>
+                            <div class="form-group">
+                                <label for="quotaConsolation">🎁 Giải Khuyến Khích (Số xe):</label>
+                                <input type="number" id="quotaConsolation" min="1" max="30" value="5">
                             </div>
 
-                            <button type="button" id="savePrizeQuotaBtn" class="btn btn-primary btn-block">💾 Lưu Cấu Hình Cấu Hình Cuộc Đua</button>
+                            <button type="button" id="savePrizeQuotaBtn" class="btn btn-primary btn-block">💾 Lưu Cấu Hình Số Lượng Giải</button>
                         </form>
                     </div>
 
@@ -394,6 +388,7 @@
     </footer>
 
     <!-- Scripts -->
+    <script src="script.js"></script>
     <script src="minigame.js"></script>
 </body>
 </html>
